@@ -21,7 +21,8 @@ class MemTransformerLM(nn.Module):
                  cutoffs=[], adapt_inp=False,
                  same_length=False, attn_type=0, clamp_len=-1, 
                  sample_softmax=-1,
-                 max_ep_len=1000,):
+                 max_ep_len=1000,
+                 mode='mujoco'):
         super(MemTransformerLM, self).__init__()
         #self.n_token = n_token
 
@@ -33,6 +34,7 @@ class MemTransformerLM(nn.Module):
 
         self.STATE_DIM = STATE_DIM
         self.ACTION_DIM = ACTION_DIM
+        self.mode = mode
 
         
         #self.state_encoder = nn.Sequential(nn.Conv2d(4, 32, 8, stride=4, padding=0), nn.ReLU(),
@@ -49,7 +51,11 @@ class MemTransformerLM(nn.Module):
         self.embed_ln = nn.LayerNorm(d_embed)
 
 
-        self.head = nn.Sequential(*([nn.Linear(d_embed, self.ACTION_DIM)] + ([nn.Tanh()])))
+        if self.mode == 'mujoco':
+            self.head = nn.Sequential(*([nn.Linear(d_embed, self.ACTION_DIM)] + ([nn.Tanh()])))
+
+        if self.mode == 'tmaze':
+            self.head = nn.Sequential(*([nn.Linear(d_embed, 2)] + ([nn.Tanh()])))
         
         
         self.drop = nn.Dropout(dropout)
@@ -364,7 +370,10 @@ class MemTransformerLM(nn.Module):
         
         loss = None
         if target is not None:
-            loss = nn.MSELoss()(logits, target)
+            if self.mode == 'mujoco':
+                loss = nn.MSELoss()(logits, target)
+            if self.mode == 'tmaze':
+                loss = F.cross_entropy(logits.reshape(-1, logits.size(-1)), target.reshape(-1).long())
         
         output = [logits, loss]
         if new_mems is not None:
