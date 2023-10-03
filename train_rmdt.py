@@ -1,6 +1,13 @@
 import sys
 import os
 os.environ["LD_LIBRARY_PATH"]="/.mujoco/mujoco210/bin"
+os.environ["LD_LIBRARY_PATH"]="/home/jovyan/.mujoco/mujoco210/bin"
+
+
+os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+os.environ['WANDB_MODE'] = 'online'
+
 
 import gym
 import numpy as np
@@ -16,10 +23,13 @@ import random
 import sys
 import os
 import glob
-import d4rl
 from colabgymrender.recorder import Recorder
-sys.path.append('/root/RMDT_tests/rmdt_transformer/gym/')
+sys.path.append('rmdt_transformer/gym/')
 from decision_transformer.evaluation.evaluate_episodes import evaluate_episode, evaluate_episode_rtg
+
+
+#pip install imageio-ffmpeg
+
 
 from utils.eval_functions import get_batch, get_returns
 
@@ -35,6 +45,8 @@ ENVS = [['halfcheetah-medium-v2','checkpoints_Cheetah_Med',17,6,1000,6000],
         ['hopper-medium-replay-v2','checkpoints_Hopper_Med_Repl',11,3,1000,3600],
         ['hopper-expert-v2','checkpoints_Hopper_Expert',11,3,1000,3600],
        ]
+
+INIT_ENV = False
 
 class Args:
     def __init__(self):
@@ -102,10 +114,11 @@ class Agent:
         ret_global = gym_name[5]
         use_recorder = False
         
-        self.env = gym.make(game_gym_name)
-        directory = '../video'
-        if use_recorder:
-            self.env = Recorder(self.env, directory, fps=30)
+        if INIT_ENV:
+            self.env = gym.make(game_gym_name)
+            directory = '../video'
+            if use_recorder:
+                self.env = Recorder(self.env, directory, fps=30)
     
         # load dataset
         dataset_path = f'../data/{env_name}-{dataset}-v2.pkl'
@@ -162,7 +175,7 @@ class Agent:
     def train(self):
         args = self.args
         
-        INTERVAL = 100
+        INTERVAL = 200
         losses = []
         wandb_step  = 0
         for epoch in range(args.max_epochs):
@@ -178,6 +191,7 @@ class Agent:
                 mem_tokens=None
 
                 for block_part in range(args.EFFECTIVE_SIZE_BLOCKS//args.BLOCKS_CONTEXT):
+
                     from_idx = block_part*(args.BLOCKS_CONTEXT)
                     to_idx = (block_part+1)*(args.BLOCKS_CONTEXT)
                     x1 = s[:, from_idx:to_idx, :].to(self.device)
@@ -198,7 +212,7 @@ class Agent:
                         memory = res[0][2:]
                         logits, loss = res[0][0], res[0][1]
                         losses.append(loss.item())
-                        print('Loss: ',loss.item())
+                        #print('Loss: ',loss.item())
                         if args.wandb:
                             wandb.log({"train_loss":  loss.item()})
                             
@@ -215,34 +229,36 @@ class Agent:
                         pbar.set_description(f"epoch {epoch+1} iter {it}: train loss {loss.item():.5f}. lr {lr:e}")     
                 
                 if it % INTERVAL == 0:
-                    rews = []
-                    steps = 10
-                    prompt_steps = 1
-                    pbar = tqdm(enumerate(list(range(steps))), total=steps)
-                    for it, i in pbar:
-                        eval_return, self.env = get_returns(self.model, self.env,args.ret_global, args.context_length, args.state_dim, args.act_dim, self.state_mean_torch, self.state_std_torch, self.max_ep_len, self.device, prompt_steps=prompt_steps, memory_20step=True, without_memory=False)
-                        rews.append(eval_return)
-                            
-                    print(f"Prompt_steps: {prompt_steps}  Mean Reward: {np.mean(np.array(rews)):.5f}. STD Reward: {np.std(np.array(rews)):.5f}")        
-                    if args.wandb:            
-                        wandb.log({"episode_STD":  np.std(rews)})#, step=wandb_step)
-                        wandb.log({"episode_MEAN":  np.mean(rews)})#, step=wandb_step)
-        
-                    rews = []
-                    steps = 10
-                    prompt_steps = args.context_length
-                    pbar = tqdm(enumerate(list(range(steps))), total=steps)
-                    for it, i in pbar:
-                        eval_return, self.env = get_returns(self.model, self.env,args.ret_global, args.context_length, args.state_dim, args.act_dim, self.state_mean_torch, self.state_std_torch, self.max_ep_len, self.device, prompt_steps=prompt_steps, memory_20step=True, without_memory=False)
-                        rews.append(eval_return)
-                            
-                    print(f"Prompt_steps: {prompt_steps}  Mean Reward: {np.mean(np.array(rews)):.5f}. STD Reward: {np.std(np.array(rews)):.5f}")        
-                    if args.wandb:            
-                        wandb.log({"{}_episode_STD".format(args.context_length):  np.std(rews)}) #, step=wandb_step)
-                        wandb.log({"{}_episode_MEAN".format(args.context_length):  np.mean(rews)}) #, step=wandb_step)
+                    
+                    if INIT_ENV:
+                        rews = []
+                        steps = 10
+                        prompt_steps = 1
+                        pbar = tqdm(enumerate(list(range(steps))), total=steps)
+                        for it, i in pbar:
+                            eval_return, self.env = get_returns(self.model, self.env,args.ret_global, args.context_length, args.state_dim, args.act_dim, self.state_mean_torch, self.state_std_torch, self.max_ep_len, self.device, prompt_steps=prompt_steps, memory_20step=True, without_memory=False)
+                            rews.append(eval_return)
+
+                        print(f"Prompt_steps: {prompt_steps}  Mean Reward: {np.mean(np.array(rews)):.5f}. STD Reward: {np.std(np.array(rews)):.5f}")        
+                        if args.wandb:            
+                            wandb.log({"episode_STD":  np.std(rews)})#, step=wandb_step)
+                            wandb.log({"episode_MEAN":  np.mean(rews)})#, step=wandb_step)
+
+                        rews = []
+                        steps = 10
+                        prompt_steps = args.context_length
+                        pbar = tqdm(enumerate(list(range(steps))), total=steps)
+                        for it, i in pbar:
+                            eval_return, self.env = get_returns(self.model, self.env,args.ret_global, args.context_length, args.state_dim, args.act_dim, self.state_mean_torch, self.state_std_torch, self.max_ep_len, self.device, prompt_steps=prompt_steps, memory_20step=True, without_memory=False)
+                            rews.append(eval_return)
+
+                        print(f"Prompt_steps: {prompt_steps}  Mean Reward: {np.mean(np.array(rews)):.5f}. STD Reward: {np.std(np.array(rews)):.5f}")        
+                        if args.wandb:            
+                            wandb.log({"{}_episode_STD".format(args.context_length):  np.std(rews)}) #, step=wandb_step)
+                            wandb.log({"{}_episode_MEAN".format(args.context_length):  np.mean(rews)}) #, step=wandb_step)
 
                     wandb_step += 1     
-                    torch.save(self.model.state_dict(), args.ckpt_path+'_'+str(wandb_step)+'_HOPPER_medexp.pth')
+                    torch.save(self.model.state_dict(), args.ckpt_path+'/'+str(wandb_step)+'.pth')
         
 
 
@@ -252,9 +268,10 @@ if __name__ == "__main__":
     parser.add_argument("env_id")
     parser.add_argument("number_of_segments")
     parser.add_argument("segment_lenght")
+    parser.add_argument("num_mem_tokens",default=15)
     
     args_INPUT = parser.parse_args()
-    print(args_INPUT.env_id,args_INPUT.number_of_segments,args_INPUT.segment_lenght)
+    print(args_INPUT.env_id,args_INPUT.number_of_segments,args_INPUT.segment_lenght,args_INPUT.num_mem_tokens)
 
 
     #index = int(input('Choose env and dataset index: '))
@@ -266,6 +283,7 @@ if __name__ == "__main__":
     args.env_id = int(args_INPUT.env_id)
     args.context_length = int(args_INPUT.segment_lenght) #40
     args.sections = int(args_INPUT.number_of_segments) #3
+    args.num_mem_tokens = int(args_INPUT.num_mem_tokens) #3*5
 
     
     args.block_size = 3*args.context_length
@@ -282,8 +300,8 @@ if __name__ == "__main__":
     args.max_ep_len = gym_name[4]
     args.ret_global = gym_name[5]
     args.use_recorder = False
-    args.ckpt_path = '../checkpoints/{}_ns_{}_sl_{}'.format('_'.join(args.game_gym_name.split('-')[:-1]),args_INPUT.number_of_segments,args_INPUT.segment_lenght)
-    args.max_epochs = 100
+    args.ckpt_path = '../checkpoints_seed3/{}_ns_{}_sl_{}_nt_{}'.format('_'.join(args.game_gym_name.split('-')[:-1]),args_INPUT.number_of_segments,args_INPUT.segment_lenght,args_INPUT.num_mem_tokens)
+    args.max_epochs = 20
     args.lr_decay = False
     args.wandb = True
 
@@ -297,8 +315,8 @@ if __name__ == "__main__":
         os.remove(f) 
 
     if args.wandb:
-        idd = 'tzuzlv1i' #
-        wandb.init(project="rnd_habitat", name='revert_'+args.ckpt_path.split('/')[-1], save_code=True, resume="allow")
+        idd = 'wandb_id' #
+        wandb.init(project="your_project", name=args.ckpt_path.split('/')[-1], save_code=True, resume="allow")
 
 
     agent = Agent(args)
@@ -306,13 +324,3 @@ if __name__ == "__main__":
     agent.load_dataset()
     agent.load_model()
     agent.train()
-
-
-    print(args.ckpt_path)
-
-
-# python3 train_rmdt.py 0 3 20
-
-# 1 3 20
-# 6 3 20
-# 3 3 20

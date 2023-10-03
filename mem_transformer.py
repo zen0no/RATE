@@ -311,9 +311,9 @@ class MemTransformerLM(nn.Module):
                                  mems=mems_i)
                 hids.append(core_out)
 
-        #core_out = self.drop(core_out)
+        core_out = self.drop(core_out)
 
-        new_mems = self._update_mems(hids, mems, mlen, qlen)             #(hids, mems, qlen, mlen) #(hids, mems, mlen, qlen) original
+        new_mems = self._update_mems(hids, mems, qlen, mlen)             #(hids, mems, qlen, mlen) #(hids, mems, mlen, qlen) original
 
         return core_out, new_mems
 
