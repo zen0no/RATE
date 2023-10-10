@@ -71,11 +71,11 @@ class Args:
         self.d_inner = 128
         self.dropout = 0.1
         self.dropatt = 0.05
-        self.MEM_LEN = 2               ########################### 2 FOR DTXL 0
+        self.MEM_LEN = 2               
         self.ext_len = 1
         self.tie_weight = False
-        self.num_mem_tokens = 3*5      ########################### 3*5 FOR DTXL 0
-        self.mem_at_end = True         ########################### True FOR DTXL False
+        self.num_mem_tokens = 3*5      
+        self.mem_at_end = True         
         self.learning_rate = 1e-4
         self.weight_decay = 1e-4
         self.betas = (0.9, 0.95)

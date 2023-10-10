@@ -35,18 +35,11 @@ class MemTransformerLM(nn.Module):
         self.STATE_DIM = STATE_DIM
         self.ACTION_DIM = ACTION_DIM
         self.mode = mode
-
-        
-        #self.state_encoder = nn.Sequential(nn.Conv2d(4, 32, 8, stride=4, padding=0), nn.ReLU(),
-        #                         nn.Conv2d(32, 64, 4, stride=2, padding=0), nn.ReLU(),
-        #                         nn.Conv2d(64, 64, 3, stride=1, padding=0), nn.ReLU(),
-        #                         nn.Flatten(), nn.Linear(3136, d_embed), nn.Tanh())
-        
         
         self.embed_timestep = nn.Embedding(max_ep_len, d_embed)
         self.ret_emb = nn.Linear(1, d_embed)
-        self.state_encoder = nn.Linear(self.STATE_DIM, d_embed) #RMT MUJOCO
-        self.action_embeddings = nn.Linear(self.ACTION_DIM, d_embed) #RMT MUJOCO
+        self.state_encoder = nn.Linear(self.STATE_DIM, d_embed) #MUJOCO
+        self.action_embeddings = nn.Linear(self.ACTION_DIM, d_embed) #MUJOCO
 
         self.embed_ln = nn.LayerNorm(d_embed)
 
@@ -54,8 +47,23 @@ class MemTransformerLM(nn.Module):
         if self.mode == 'mujoco':
             self.head = nn.Sequential(*([nn.Linear(d_embed, self.ACTION_DIM)] + ([nn.Tanh()])))
 
-        if self.mode == 'tmaze':
-            self.head = nn.Sequential(*([nn.Linear(d_embed, 2)] + ([nn.Tanh()])))
+        if self.mode == 'doom':
+            self.head = nn.Linear(d_embed, self.ACTION_DIM, bias=False)
+            self.state_encoder = nn.Sequential(nn.Conv2d(3, 32, 8, stride=4, padding=0), nn.ReLU(),
+                                 nn.Conv2d(32, 64, 4, stride=2, padding=0), nn.ReLU(),
+                                 nn.Conv2d(64, 64, 3, stride=1, padding=0), nn.ReLU(),
+                                 nn.Flatten(), nn.Linear(2560, d_embed), nn.Tanh())
+            
+        if self.mode == 'atari':
+            self.state_encoder = nn.Sequential(nn.Conv2d(4, 32, 8, stride=4, padding=0), nn.ReLU(),
+                                     nn.Conv2d(32, 64, 4, stride=2, padding=0), nn.ReLU(),
+                                     nn.Conv2d(64, 64, 3, stride=1, padding=0), nn.ReLU(),
+                                     nn.Flatten(), nn.Linear(3136, d_embed), nn.Tanh())
+
+            self.ret_emb = nn.Sequential(nn.Linear(1, d_embed), nn.Tanh())
+
+            self.action_embeddings = nn.Sequential(nn.Embedding(n_token, d_embed), nn.Tanh())
+            self.head = nn.Linear(d_embed, self.ACTION_DIM, bias=False)
         
         
         self.drop = nn.Dropout(dropout)
@@ -313,7 +321,7 @@ class MemTransformerLM(nn.Module):
 
         core_out = self.drop(core_out)
 
-        new_mems = self._update_mems(hids, mems, qlen, mlen)             #(hids, mems, qlen, mlen) #(hids, mems, mlen, qlen) original
+        new_mems = self._update_mems(hids, mems, qlen, mlen) 
 
         return core_out, new_mems
 
@@ -324,23 +332,39 @@ class MemTransformerLM(nn.Module):
         # them together.
         if not mems: mems = self.init_mems(states.device)
         
+        if self.mode == 'doom':
+            B, B1, C, H, W = states.shape
+            states = states.view(-1, C, H, W)
+        elif self.mode == 'atari':
+            B, B1, C, H, W = states.shape
+            states = states.reshape(-1, 4, 84, 84).type(torch.float32).contiguous() 
+        else:
+            B, B1, C = states.shape
+            
         state_embeddings = self.state_encoder(states) # (batch * block_size, n_embd)
+        
+        if self.mode == 'doom':
+            state_embeddings = state_embeddings.view(B, B1, self.d_embed)
+        
+        if self.mode == 'atari':
+            state_embeddings = state_embeddings.reshape(B, B1, self.d_embed)
+
         rtg_embeddings = self.ret_emb(rtgs)
         time_embeddings = self.embed_timestep(timesteps)
 
         if actions is not None:
             action_embeddings = self.action_embeddings(actions) # (batch, block_size, n_embd)
-            token_embeddings = torch.zeros((states.shape[0], states.shape[1]*3 - int(target is None), self.d_embed), dtype=torch.float32, device=state_embeddings.device)
+            token_embeddings = torch.zeros((B, B1*3 - int(target is None), self.d_embed), dtype=torch.float32, device=state_embeddings.device)
             token_embeddings[:, ::3, :] = rtg_embeddings #+ time_embeddings
             token_embeddings[:, 1::3, :] = state_embeddings #+ time_embeddings
-            token_embeddings[:, 2::3, :] = action_embeddings[:,-states.shape[1] + int(target is None):,:] #+ time_embeddings[:,-states.shape[1] + int(target is None):,:]
+            token_embeddings[:, 2::3, :] = action_embeddings[:,-B1 + int(target is None):,:] #+ time_embeddings[:,-states.shape[1] + int(target is None):,:]
             #[:,-states.shape[1] + int(target is None):,:]
 
         else:
-            token_embeddings = torch.zeros((states.shape[0], states.shape[1]*2, self.d_embed), dtype=torch.float32, device=state_embeddings.device)
+            token_embeddings = torch.zeros((B, B1*2, self.d_embed), dtype=torch.float32, device=state_embeddings.device)
             token_embeddings[:,::2,:] = rtg_embeddings #+ time_embeddings # really just [:,0,:]
             token_embeddings[:,1::2,:] = state_embeddings #+ time_embeddings # really just [:,1,:]
-            
+         
             
 
         hidden, new_mems = self._forward(token_embeddings, mems=mems, mem_tokens=mem_tokens)
@@ -368,12 +392,16 @@ class MemTransformerLM(nn.Module):
             logits = logits[:, 1:, :]
             
         
-        loss = None
+        loss = None        
         if target is not None:
             if self.mode == 'mujoco':
                 loss = nn.MSELoss()(logits, target)
-            if self.mode == 'tmaze':
+            if self.mode == 'doom':
+                loss = F.cross_entropy(logits.reshape(-1, logits.size(-1)), target.reshape(-1).long()) 
+            if self.mode == 'atari':
                 loss = F.cross_entropy(logits.reshape(-1, logits.size(-1)), target.reshape(-1).long())
+        
+        #return logits.reshape(-1, logits.size(-1)), target.reshape(-1).long()
         
         output = [logits, loss]
         if new_mems is not None:
@@ -388,15 +416,7 @@ class MemTransformerLM(nn.Module):
     
     
 
-
-######################################################################################    
-######################################################################################    
-######################################################################################    
-######################################################################################    
-######################################################################################    
-######################################################################################    
-######################################################################################    ######################################################################################    
-######################################################################################    
+ 
     
     
 class PositionalEmbedding(nn.Module):
@@ -887,3 +907,4 @@ class AdaptiveEmbedding(nn.Module):
         embed.mul_(self.emb_scale)
 
         return embed    
+
