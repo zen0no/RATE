@@ -1,7 +1,6 @@
 import sys
 import os
 os.environ["LD_LIBRARY_PATH"]="/.mujoco/mujoco210/bin"
-os.environ["LD_LIBRARY_PATH"]="/home/jovyan/.mujoco/mujoco210/bin"
 
 
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
@@ -24,12 +23,6 @@ import sys
 import os
 import glob
 from colabgymrender.recorder import Recorder
-sys.path.append('rmdt_transformer/gym/')
-from decision_transformer.evaluation.evaluate_episodes import evaluate_episode, evaluate_episode_rtg
-
-
-#pip install imageio-ffmpeg
-
 
 from utils.eval_functions import get_batch, get_returns
 
@@ -51,18 +44,13 @@ INIT_ENV = False
 class Args:
     def __init__(self):
         self.seed=123
-        #self.context_length=user_config.context_length
-        #self.epochs=user_config.epochs
         self.num_steps= 500000
         self.num_buffers=50
-        #self.game=user_config.game
         self.batch_size=128
         self.nemb=128
         self.data_dir_prefix='../data/'
         self.trajectories_per_buffer=10
         self.use_scheduler=True
-        #self.ckpt_path = user_config.save_path
-
         self.vocab_size = 100
         self.n_layer = 3
         self.n_head = 1
@@ -210,9 +198,10 @@ class Agent:
                         else:
                             res = self.model(x1, y1, r1, y1,t1, mem_tokens=mem_tokens)
                         memory = res[0][2:]
+                        mem_tokens = res[1]
                         logits, loss = res[0][0], res[0][1]
                         losses.append(loss.item())
-                        #print('Loss: ',loss.item())
+
                         if args.wandb:
                             wandb.log({"train_loss":  loss.item()})
                             
@@ -271,19 +260,16 @@ if __name__ == "__main__":
     parser.add_argument("num_mem_tokens",default=15)
     
     args_INPUT = parser.parse_args()
-    print(args_INPUT.env_id,args_INPUT.number_of_segments,args_INPUT.segment_lenght,args_INPUT.num_mem_tokens)
 
-
-    #index = int(input('Choose env and dataset index: '))
     index = int(args_INPUT.env_id)
     
     gym_name = ENVS[index]
 
     args = Args()
     args.env_id = int(args_INPUT.env_id)
-    args.context_length = int(args_INPUT.segment_lenght) #40
-    args.sections = int(args_INPUT.number_of_segments) #3
-    args.num_mem_tokens = int(args_INPUT.num_mem_tokens) #3*5
+    args.context_length = int(args_INPUT.segment_lenght) 
+    args.sections = int(args_INPUT.number_of_segments)
+    args.num_mem_tokens = int(args_INPUT.num_mem_tokens)
 
     
     args.block_size = 3*args.context_length

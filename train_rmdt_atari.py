@@ -419,6 +419,7 @@ class Trainer:
                         else:
                             res = model(x1, y1, r1, y1, None, mem_tokens=mem_tokens)
                         memory = res[0][2:]
+                        mem_tokens = res[1]
                         logits, loss = res[0][0], res[0][1]
                         
                         mem_tokens = res[1]

@@ -11,7 +11,7 @@ import sys
 import os
 import glob
 from colabgymrender.recorder import Recorder
-sys.path.append('/root/RMDT_paper/rmdt_transformer/gym/')
+sys.path.append('./rmdt_transformer/gym/')
 from decision_transformer.evaluation.evaluate_episodes import evaluate_episode, evaluate_episode_rtg
 
 def discount_cumsum(x, gamma):
@@ -135,7 +135,7 @@ def sample(model, x, block_size, steps, temperature=1.0, sample=False, top_k=Non
         
     return logits, mem_tokens, memory
 
-def get_returns(model, env, ret, context_length, state_dim, act_dim, state_mean_torch, state_std_torch, max_ep_len, device, use_recorder=False, return_frames=False, prompt_steps=5, memory_20step=True, without_memory=False):
+def get_returns(model, env, ret, context_length, state_dim, act_dim, state_mean_torch, state_std_torch, max_ep_len, device, use_recorder=False, return_frames=False, prompt_steps=0, memory_20step=True, without_memory=False):
 
     ret = ret/SCALE
 
@@ -165,13 +165,13 @@ def get_returns(model, env, ret, context_length, state_dim, act_dim, state_mean_
             if prompt_steps==0:
                 actions = actions[-1:,:]
                 states = states[-1:, :]
-                target_return = target_return[:,-1:]
+                target_return = torch.tensor(ret, device=device, dtype=torch.float32).reshape(1, 1)
                 timesteps = timesteps[:, -1:]
                 act_new_segment = True
             else:
                 actions = actions[-prompt_steps:,:]
                 states = states[-prompt_steps:, :]
-                target_return = target_return[:,-prompt_steps:]#+3600.
+                target_return = target_return[:,-prompt_steps:]
                 timesteps = timesteps[:, -prompt_steps:]
                 
             if not without_memory:
@@ -202,7 +202,6 @@ def get_returns(model, env, ret, context_length, state_dim, act_dim, state_mean_
                                                     mem_tokens=mem_tokens, 
                                                     saved_context=saved_context) 
 
-        #actions[-1] = sampled_action
         actions = torch.cat([actions, sampled_action])
 
         action = sampled_action.cpu().numpy()[0]
