@@ -10,14 +10,21 @@ import argparse
 import random
 
 # python3 TMaze_new/TMaze_new_src/train_rmdt_new_gtrxl.py 
+# import os
+# import sys
+# sys.path.append('././')
+
+import sys,os
+sys.path.append(os.getcwd())
 
 OMP_NUM_THREADS = '4'
 os.environ['OMP_NUM_THREADS'] = OMP_NUM_THREADS 
 
 from RATE_GTrXL import mem_transformer_v2_GTrXL
+
 from TMaze_new.TMaze_new_src.tmaze_new_dataset import TMaze_data_generator, CombinedDataLoader
 from TMaze_new.TMaze_new_src.val_tmaze import get_returns_TMaze
-from TMaze_new.TMaze_new_src.additional import plot_cringe
+# from TMaze_new.TMaze_new_src.additional import plot_cringe
 
 
 def set_seed(seed: int = 42) -> None:
@@ -394,7 +401,7 @@ for RUN in range(start_seg, end_seg+1):
         "batch_size": 64, # 64
         "warmup_steps": 50,  # 100
         "grad_norm_clip": 1.0, # 0.25 
-        "wwandb": True, 
+        "wwandb": False, 
         "sections": max_n_final,                  ##################### d_head * nmt = diff params
         "context_length": 30,
         "epochs": 250, #250
