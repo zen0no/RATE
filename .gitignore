@@ -1,0 +1,11 @@
+*.pth
+*.png
+*.jpg
+*.mp4
+*.pickle
+*.gif
+*.pyc
+*.txt
+*.csv
+wandb/
+__pycache__/
