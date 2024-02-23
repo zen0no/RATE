@@ -1,10 +1,15 @@
 # Recurrent Action Transformer with Memory (RATE) 
-- [ ] TMaze
-- [ ] VizDoom
-- [ ] Memory Maze
+- [x] TMaze (done)
+- [ ] VizDoom (coming soon)
+- [ ] Memory Maze (TBD)
+
+# TMaze 
+```bash
+find . -type f -name "*\.sh" -exec chmod +x {} \;
+```
 
 
-**TBD**
+
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠠⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⠀⢀⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀
 ⠀⠀⠀⠀⠀⠀⠀⠀⠐⠀⣴⣤⡀⠀⢀⣀⣤⠤⠤⠶⠖⠒⠒⠒⠒⠒⠲⠶⠤⢤⣀⡀⣼⣛⣧⠀⢁⠀⠀⠀⠀⠀⠀
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣸⣏⢻⣍⠁⠀⢀⡀⠤⠄⠒⠒⠒⠒⠒⠒⠀⠤⠄⠀⠀⢸⡳⢾⢹⡀⠀⠀⠀⠀⠀⠀⠀
