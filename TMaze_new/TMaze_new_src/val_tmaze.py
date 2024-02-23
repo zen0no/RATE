@@ -2,9 +2,7 @@ import os
 import sys
 OMP_NUM_THREADS = '1'
 os.environ['OMP_NUM_THREADS'] = OMP_NUM_THREADS 
-
-from RMDT_model.RMDT import mem_transformer_v2
-
+from RATE_GTrXL import mem_transformer_v2_GTrXL
 import pickle
 import torch
 from torch.utils.data import Dataset, DataLoader

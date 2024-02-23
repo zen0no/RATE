@@ -15,7 +15,6 @@ OMP_NUM_THREADS = '4'
 os.environ['OMP_NUM_THREADS'] = OMP_NUM_THREADS 
 
 from RATE_GTrXL import mem_transformer_v2_GTrXL
-from RMDT_model.RMDT import mem_transformer_v2
 from TMaze_new.TMaze_new_src.tmaze_new_dataset import TMaze_data_generator, CombinedDataLoader
 from TMaze_new.TMaze_new_src.val_tmaze import get_returns_TMaze
 from TMaze_new.TMaze_new_src.additional import plot_cringe
@@ -395,7 +394,7 @@ for RUN in range(start_seg, end_seg+1):
         "batch_size": 64, # 64
         "warmup_steps": 50,  # 100
         "grad_norm_clip": 1.0, # 0.25 
-        "wwandb": True, 
+        "wwandb": False, 
         "sections": max_n_final,                  ##################### d_head * nmt = diff params
         "context_length": 30,
         "epochs": 250, #250
@@ -468,7 +467,7 @@ for RUN in range(start_seg, end_seg+1):
     name = f'{TEXT_DESCRIPTION}_{mini_text}_{config["model_mode"]}_min_{min_n_final}_max_{max_n_final}_RUN_{RUN}_{date_time}'
     current_dir = os.getcwd()
     current_folder = os.path.basename(current_dir)
-    ckpt_path = f'../{current_folder}/TMaze_new/TMaze_new_checkpoints/RATE_no_es_rew_4_vs_min1/{name}/'
+    ckpt_path = f'../{current_folder}/TMaze_new/TMaze_new_checkpoints/trash/{name}/'
     isExist = os.path.exists(ckpt_path)
     if not isExist:
         os.makedirs(ckpt_path)

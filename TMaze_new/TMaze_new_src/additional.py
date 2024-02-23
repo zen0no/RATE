@@ -4,7 +4,7 @@ os.environ['OMP_NUM_THREADS'] = OMP_NUM_THREADS
 
 import sys
 sys.path.append("RMDT_model/RMDT/")
-import mem_transformer_v2
+from RATE_GTrXL import mem_transformer_v2_GTrXL
 
 import datetime
 import pickle
