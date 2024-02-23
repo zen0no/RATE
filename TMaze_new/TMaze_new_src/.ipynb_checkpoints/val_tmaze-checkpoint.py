@@ -3,7 +3,7 @@ import sys
 OMP_NUM_THREADS = '1'
 os.environ['OMP_NUM_THREADS'] = OMP_NUM_THREADS 
 
-from RMDT_model.RMDT import mem_transformer_v2
+from RATE_model.RATE import mem_transformer_v2
 
 import pickle
 import torch

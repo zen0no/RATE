@@ -1,45 +1,7 @@
-import os
-import sys
-OMP_NUM_THREADS = '1'
-os.environ['OMP_NUM_THREADS'] = OMP_NUM_THREADS 
-from RATE_GTrXL import mem_transformer_v2_GTrXL
-import pickle
-import torch
-from torch.utils.data import Dataset, DataLoader
-from sklearn.model_selection import train_test_split
 import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
-import torch.nn.functional as F
-import matplotlib.pyplot as plt
-import seaborn as sns 
 import torch
-import glob
-# from tqdm.notebook import tqdm
-from tqdm import tqdm
-import wandb
-import random
-from itertools import product
-sns.set_style("whitegrid")
-sns.set_palette("colorblind")
-
 from TMaze_new.TMaze_new_src.tmaze import TMazeClassicPassive
 
-seeds_list = [0,2,3,4,6,9,13,15,18,24,25,31,3,40,41,42,43,44,48,49,50,
-              51,62,63,64,65,66,69,70,72,73,74,75,83,84,85,86,87,88,91,
-              92,95,96,97,98,100,102,105,106,107,1,5,7,8,10,11,12,14,16,
-              17,19,20,21,22,23,26,27,28,29,30,32,34,35,36,37,38,39,45,
-              46,47,52,53,54,55,56,57,58,59,60,61,67,68,71,76,77,78,79,80,81,82]
-
-def set_seed(seed):
-    random.seed(seed)
-    os.environ['PYTHONHASHSEED'] = str(seed)
-    np.random.seed(seed) # it's ruine np.random.choice()
-    torch.manual_seed(seed)
-    torch.cuda.manual_seed(seed)
-    torch.backends.cudnn.deterministic = True
-    torch.backends.cudnn.benchmark = True
-    
 @torch.no_grad()
 def sample(model, x, block_size, steps, sample=False, top_k=None, actions=None, rtgs=None, timestep=None, mem_tokens=1, saved_context=None):
     
@@ -70,7 +32,7 @@ def get_returns_TMaze(model, ret, seed, episode_timeout, corridor_length, contex
     channels = 5
     max_ep_len = episode_timeout
 
-    env = TMazeClassicPassive(episode_length=episode_timeout, corridor_length=corridor_length, penalty=0, seed=seed)
+    env = TMazeClassicPassive(episode_length=episode_timeout, corridor_length=corridor_length, penalty=0, seed=seed, goal_reward=ret)
     state = env.reset() # {x, y, hint}
     np.random.seed(seed)
     where_i = state[0]
@@ -246,8 +208,3 @@ def get_returns_TMaze(model, ret, seed, episode_timeout, corridor_length, contex
         print("\n")
         
     return reward, act_list, t, np.array(out_states).squeeze(), delta_t, attentions
-
-
-#=============================================================================================================================================================================================================#
-
-

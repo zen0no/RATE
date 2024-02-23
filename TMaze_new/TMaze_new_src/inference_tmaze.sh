@@ -1,15 +1,15 @@
 #!/bin/bash
 
-# #DT + RMDT
+# #DT + RATE
 # cd TMaze_new/TMaze_new_checkpoints/GTrXL
 # for dir in */; do
 #     echo "${dir%/}"
 #     cd
-#     cd Egor_C/REPOSITORIES/RMDT
+#     cd Egor_C/REPOSITORIES/RATE
 #     if [[ "$dir" == *_DT_* ]]; then
 #         python3 TMaze_new/TMaze_new_src/inference_tmaze.py --model_mode 'DT' --max_n_final 9 --ckpt_name "${dir%/}" --ckpt_chooser 0
 #     else
-#         python3 TMaze_new/TMaze_new_src/inference_tmaze.py --model_mode 'RMDT' --max_n_final 9 --ckpt_name "${dir%/}" --ckpt_chooser 0
+#         python3 TMaze_new/TMaze_new_src/inference_tmaze.py --model_mode 'RATE' --max_n_final 9 --ckpt_name "${dir%/}" --ckpt_chooser 0
 #     fi
 #     cd TMaze_new/TMaze_new_checkpoints/GTrXL
 # done
@@ -18,10 +18,10 @@
 # for dir in */; do
 #     echo "${dir%/}"
 #     cd
-#     cd Egor_C/REPOSITORIES/RMDT
+#     cd Egor_C/REPOSITORIES/RATE
     
-#     if [[ "$dir" == *_RMDT_* ]]; then
-#         python3 TMaze_new/TMaze_new_src/inference_tmaze.py --model_mode 'RMDT' --max_n_final 9 --ckpt_name "${dir%/}" --ckpt_chooser 0
+#     if [[ "$dir" == *_RATE_* ]]; then
+#         python3 TMaze_new/TMaze_new_src/inference_tmaze.py --model_mode 'RATE' --max_n_final 9 --ckpt_name "${dir%/}" --ckpt_chooser 0
 #     fi
 
 #     cd TMaze_new/TMaze_new_checkpoints/GTrXL
@@ -107,5 +107,5 @@ find -type f -name "*_${mode%/}_*" ! -name '*FINAL*' -delete
 cd $OLDPWD
 
 
-# ~/Egor_C/REPOSITORIES/RMDT$ TMaze_new/TMaze_new_src/inference_tmaze.sh
-# TMaze_new/TMaze_new_src/inference_tmaze.sh -c 'DT_RATE_GRATE' -m 'RMDT' -a 'TrXL'
+# ~/Egor_C/REPOSITORIES/RATE$ TMaze_new/TMaze_new_src/inference_tmaze.sh
+# TMaze_new/TMaze_new_src/inference_tmaze.sh -c 'DT_RATE_GRATE' -m 'RATE' -a 'TrXL'

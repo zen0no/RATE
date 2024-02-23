@@ -1,0 +1,56 @@
+wandb_config:
+    project_name: "RATE_TMaze"
+    wwandb: False
+
+data_config:
+  # noise augmentation of data
+  multiplier: 50
+  # number of hint steps
+  hint_steps: 1
+  # cutting previous data in half when adding new segment during training. 
+  cut_dataset: False
+  # reward on succesful completion of an episode
+  desired_reward: 1.0 # defalt: 1.0
+  # adding only succesful trajectories to the dataset
+  win_only: False # default: True
+
+training_config:
+  learning_rate: 0.0001 # 1e-4
+  weight_decay: 0.1
+  batch_size: 64 # 64
+  warmup_steps: 50  # 100
+  grad_norm_clip: 1.0 # 0.25 
+  context_length: 30
+  epochs: 250 #250
+  use_erl_stop: True
+  # inference during training
+  online_inference: False
+  # adding weight to the loss on the last valid action
+  coef: 0.0
+
+model_config:
+  mode: "tmaze"
+  STATE_DIM: 4
+  ACTION_DIM: 1
+  n_token: 10000 # vocab_size
+  n_layer: 8 # 8 
+  n_head: 10 # 10
+  d_model: 256 # 256
+  d_head: 128 # 128 # divider of d_model
+  d_inner: 512 # 512 # > d_model
+  dropout: 0.05 # 0.1  
+  dropatt: 0.00 # 0.05
+  mem_len: 2
+  ext_len: 1
+  tie_weight: False
+  num_mem_tokens: 5 # 5 d_head * nmt = diff params
+  mem_at_end: True
+
+online_inference_config:
+  episode_timeout:
+  corridor_length:
+
+
+
+
+

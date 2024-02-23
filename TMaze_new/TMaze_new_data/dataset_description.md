@@ -1,0 +1,1 @@
+The datasets generated at `train_tmaze.py` runtime will appear in this directory. The data, if it is not in this directory, is generated for the given dataset configuration is generated only at the first call of the function and is subsequently reused.

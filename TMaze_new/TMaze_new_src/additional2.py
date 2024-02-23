@@ -3,7 +3,7 @@ OMP_NUM_THREADS = '1'
 os.environ['OMP_NUM_THREADS'] = OMP_NUM_THREADS
 
 import sys
-sys.path.append("RMDT_model/RMDT/")
+sys.path.append("RATE_model/RATE/")
 from RATE_GTrXL import mem_transformer_v2_GTrXL
 
 import datetime
@@ -52,7 +52,7 @@ def get_flatten_pic_attn_state(attn_map_list, config, mem_at_end):
     # elif size_diff < 0:
     #     attn_map_list[0] = np.pad(attn_map_list[0], ((0, abs(size_diff)), (0, 0)), mode='constant')
     
-    if config["model_mode"] == "RMDT":
+    if config["model_mode"] == "RATE":
         lst = []
         for i in range(len(attn_map_list)):
             attn_weights = attn_map_list[i]
@@ -218,7 +218,7 @@ def stretch_array(array, target_shape):
 
     return stretched_array
 
-# pil_image = Image.open('../RMDT/TMaze/TMaze_curriculum/anime.png')
+# pil_image = Image.open('../RATE/TMaze/TMaze_curriculum/anime.png')
 # resized_image = pil_image.resize((40, 40))
 
 

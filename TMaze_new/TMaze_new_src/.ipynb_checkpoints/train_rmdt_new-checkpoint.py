@@ -11,7 +11,7 @@ import argparse
 OMP_NUM_THREADS = '1'
 os.environ['OMP_NUM_THREADS'] = OMP_NUM_THREADS 
 
-from RMDT_model.RMDT import mem_transformer_v2
+from RATE_model.RATE import mem_transformer_v2
 from TMaze_new.TMaze_new_src.tmaze_new_dataset import TMaze_data_generator, CombinedDataLoader
 from TMaze_new.TMaze_new_src.val_tmaze import get_returns_TMaze
 from TMaze_new.TMaze_new_src.additional import plot_cringe
@@ -243,7 +243,7 @@ def train(model, optimizer, scheduler, raw_model, segments_count, wandb_step, ck
 # Создание парсера аргументов
 parser = argparse.ArgumentParser(description='Description of your program')
 # Добавление аргументов
-parser.add_argument('--model_mode', type=str, default='RMDT', help='Description of model_name argument')
+parser.add_argument('--model_mode', type=str, default='RATE', help='Description of model_name argument')
 parser.add_argument('--max_n_final', type=int, default=3, help='Description of max_n_final argument')
 # Парсинг аргументов командной строки
 args = parser.parse_args()
@@ -295,7 +295,7 @@ for RUN in range(1, 10+1):
 
     }
 
-    if config["model_mode"] == "RMDT": 
+    if config["model_mode"] == "RATE": 
         config["MEM_LEN"] = 2 ########################### 2 FOR DTXL 0
         config["mem_at_end"] = True ########################### True FOR DTXL False
     elif config["model_mode"] == "DT":
@@ -306,7 +306,7 @@ for RUN in range(1, 10+1):
         config["MEM_LEN"] = 2
         config["mem_at_end"] = False
         config["num_mem_tokens"] = 0
-    elif config["model_mode"] == "RMDTM":
+    elif config["model_mode"] == "RATEM":
         config["MEM_LEN"] = 0
         config["mem_at_end"] = True
 
@@ -324,7 +324,7 @@ for RUN in range(1, 10+1):
         os.makedirs(ckpt_path)
 
     if config["wwandb"]:
-        run = wandb.init(project="TMaze_curriculum_v2", name=name, group=group, config=config, save_code=True, reinit=True) #entity="rmdt"
+        run = wandb.init(project="TMaze_curriculum_v2", name=name, group=group, config=config, save_code=True, reinit=True) #entity="RATE"
 
     TMaze_data_generator(max_segments=config["max_segments"], multiplier=config["multiplier"], hint_steps=config["hint_steps"])
 

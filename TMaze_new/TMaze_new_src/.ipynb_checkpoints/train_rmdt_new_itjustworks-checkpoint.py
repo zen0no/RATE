@@ -10,7 +10,7 @@ import wandb
 OMP_NUM_THREADS = '1'
 os.environ['OMP_NUM_THREADS'] = OMP_NUM_THREADS 
 
-from RMDT_model.RMDT import mem_transformer_v2
+from RATE_model.RATE import mem_transformer_v2
 from TMaze_new.TMaze_new_src.tmaze_new_dataset import TMaze_data_generator, CombinedDataLoader
 from TMaze_new.TMaze_new_src.val_tmaze import get_returns_TMaze
 from TMaze_new.TMaze_new_src.additional import plot_cringe
@@ -210,7 +210,7 @@ config = {
     "context_length": 30,
     "epochs": 250,
     "mode": "tmaze",
-    "model_mode": "RMDT",
+    "model_mode": "RATE",
     "state_dim": 4,
     "act_dim": 1,
     "vocab_size": 10000,
@@ -232,7 +232,7 @@ config = {
     
 }
 
-if config["model_mode"] == "RMDT":
+if config["model_mode"] == "RATE":
     config["MEM_LEN"] = 2 ########################### 2 FOR DTXL 0
     config["mem_at_end"] = True ########################### True FOR DTXL False
 elif config["model_mode"] == "DT":
@@ -242,7 +242,7 @@ elif config["model_mode"] == "DTXL":
     config["MEM_LEN"] = 2
     config["mem_at_end"] = False
     config["num_mem_tokens"] = 0
-elif config["model_mode"] == "RMDTM":
+elif config["model_mode"] == "RATEM":
     config["MEM_LEN"] = 0
     config["mem_at_end"] = True
 

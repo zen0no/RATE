@@ -134,7 +134,7 @@ class CombinedDataLoader:
     def _get_segment_dataloaders(self, N, multiplier, hint_steps, maxN, mode, desired_reward=1.0, win_only=True):
         name = f'new_tmaze_data_segment_{N}_multiplier_{multiplier}_hint_steps_{hint_steps}_desired_reward_{desired_reward}_win_only_{win_only}'
         data_path = f'TMaze_new/TMaze_new_data/{name}.pickle'
-        #data_path = f'../RMDT/TMaze/TMaze_curriculum/TMaze_curriculum_data/{name}.pickle'
+        #data_path = f'../RATE/TMaze/TMaze_curriculum/TMaze_curriculum_data/{name}.pickle'
 
         train_dataset = self._get_dataloaders(path=data_path, gamma=1.0, mode="diff", max_length=30*maxN)
 
