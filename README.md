@@ -1,4 +1,4 @@
-# Official repository for Recurrent Action Transformer with Memory (RATE) 
+# Recurrent Action Transformer with Memory (RATE) 
 
 
 
