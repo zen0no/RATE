@@ -1,5 +1,7 @@
 # Recurrent Action Transformer with Memory (RATE) 
-
+- [ ] TMaze
+- [ ] VizDoom
+- [ ] Memory Maze
 
 
 **TBD**
