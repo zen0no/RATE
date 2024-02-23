@@ -54,7 +54,7 @@ def combine_csv_files(directory, mode):
     combined_df_stat.iloc[0, 2] = ''
     for i in range(7):
         combined_df_stat.iloc[0, 3+i*2] = np.mean(np.array(combined_df.iloc[1:, 3::2].iloc[:, i].astype(float)))
-        combined_df_stat.iloc[0, 4+i*2] = np.std(np.array(combined_df.iloc[1:, 4::2].iloc[:, i].astype(float)))
+        combined_df_stat.iloc[0, 4+i*2] = np.std(np.array(combined_df.iloc[1:, 3::2].iloc[:, i].astype(float)))
     combined_df_stat
 
     combined_df = pd.concat([combined_df, combined_df_stat], ignore_index=True)

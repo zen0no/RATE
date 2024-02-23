@@ -78,7 +78,7 @@ for dir in */; do
     cd $OLDPWD
     
     #if [[ "$dir" == *_"${mode%/}"_* ]]; then
-    if [[ "$dir" == *_"${mode%/}"_* && "$dir" == *"max_3"* && "$dir" == *_"${arch_mode%/}"_* ]]; then
+    if [[ "$dir" == *_"${mode%/}"_* && "$dir" == *"max_5"* && "$dir" == *_"${arch_mode%/}"_* ]]; then
         string="${dir%/}"
         string_no_data="${string%_*_*_*_*_*_*_*}"
         new_string=""
@@ -88,23 +88,23 @@ for dir in */; do
         new_string="${new_string%_}"
         new_string_no_run="${new_string%_*}"
 
-        python3 TMaze_new/TMaze_new_src/inference_tmaze.py --model_mode "${mode%/}" --max_n_final 9 --ckpt_name "${dir%/}" --ckpt_chooser 0 --ckpt_folder "${ckpt_folder%/}" --arch_mode "${arch_mode%/}"
+        python3 TMaze_new/TMaze_new_src/inference_tmaze_20_seg.py --model_mode "${mode%/}" --max_n_final 9 --ckpt_name "${dir%/}" --ckpt_chooser 0 --ckpt_folder "${ckpt_folder%/}" --arch_mode "${arch_mode%/}"
     fi
 
     cd "$ckpt_dir"
 done
 
-location=$(pwd)
-cd $OLDPWD
+# location=$(pwd)
+# cd $OLDPWD
 
-directory="TMaze_new/TMaze_new_inference/TMaze_new_inference_${location##*/}/$new_string_no_run"
-# echo "${directory%/}"
-python3 TMaze_new/TMaze_new_src/parse_inference_csv.py --directory "${directory%/}" --mode "${mode%/}"
+# directory="TMaze_new/TMaze_new_inference/TMaze_new_inference_${location##*/}/$new_string_no_run"
+# # echo "${directory%/}"
+# python3 TMaze_new/TMaze_new_src/parse_inference_csv.py --directory "${directory%/}" --mode "${mode%/}"
 
-cd "$directory"
-#find -type f -name '*_"${mode%/}"_*' -delete
-find -type f -name "*_${mode%/}_*" ! -name '*FINAL*' -delete
-cd $OLDPWD
+# cd "$directory"
+# #find -type f -name '*_"${mode%/}"_*' -delete
+# find -type f -name "*_${mode%/}_*" ! -name '*FINAL*' -delete
+# cd $OLDPWD
 
 
 # ~/Egor_C/REPOSITORIES/RMDT$ TMaze_new/TMaze_new_src/inference_tmaze.sh

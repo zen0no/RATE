@@ -147,25 +147,9 @@ class TMazeBase(gym.Env):
             dtype=np.float32,
         )
 
-    # def reward_fn(self, done: bool, x: int, y: int, goal_y: int):
-    #     if done:  # only give bonus at the final time step
-    #         return float(y == goal_y) * self.goal_reward
-    #     else:
-    #         # a penalty (when t > o) if x < t - o (desired: x = t - o)
-    #         rew = float(x < self.time_step - self.oracle_length) * self.penalty
-    #         if x == 0:
-    #             return rew + self.distract_reward
-    #         else:
-    #             return rew
     def reward_fn(self, done: bool, x: int, y: int, goal_y: int):
         if done:  # only give bonus at the final time step
-            if y == goal_y:
-                return self.goal_reward
-            else:
-                if self.goal_reward == 1.0:
-                    return 0
-                else:
-                    return -1.0
+            return float(y == goal_y) * self.goal_reward
         else:
             # a penalty (when t > o) if x < t - o (desired: x = t - o)
             rew = float(x < self.time_step - self.oracle_length) * self.penalty
@@ -188,7 +172,7 @@ class TMazeBase(gym.Env):
         if self.time_step >= self.episode_length or (self.x == self.corridor_length and (self.y == 1 or self.y == -1)):
             done = True
         else:
-            done = False 
+            done = False
         
         
         rew = self.reward_fn(done, self.x, self.y, self.goal_y)

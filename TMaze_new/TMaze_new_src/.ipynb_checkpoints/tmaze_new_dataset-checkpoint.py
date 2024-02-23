@@ -13,11 +13,11 @@ import torch.nn.functional as F
 OMP_NUM_THREADS = '1'
 os.environ['OMP_NUM_THREADS'] = OMP_NUM_THREADS 
 
-def TMaze_data_generator(max_segments, multiplier, hint_steps, desired_reward=1.0, win_only=True):
+def TMaze_data_generator(max_segments, multiplier, hint_steps):
     current_directory = glob.os.getcwd()
     gen_flag= False
     for i in range(1, max_segments+1):
-        name = f'new_tmaze_data_segment_{i}_multiplier_{multiplier}_hint_steps_{hint_steps}_desired_reward_{desired_reward}_win_only_{win_only}'
+        name = f'new_tmaze_data_segment_{i}_multiplier_{multiplier}_hint_steps_{hint_steps}'
         data_path = current_directory + '/TMaze_new/TMaze_new_data/'
         save_path = data_path + f"{name}.pickle"
         if not os.path.exists(save_path):
@@ -25,7 +25,7 @@ def TMaze_data_generator(max_segments, multiplier, hint_steps, desired_reward=1.
                 print("Data is not available. Generating...")
                 gen_flag = True
             
-            generate_dict_with_trajectories(segments=i, multiplier=multiplier, hint_steps=hint_steps, desired_reward=desired_reward, win_only=win_only)
+            generate_dict_with_trajectories(segments=i, multiplier=multiplier, hint_steps=hint_steps)
         else:
             if i == 1: print("Data is available.")
         if i == max_segments and gen_flag == True: print("Data successfully generated.")
@@ -113,15 +113,13 @@ class CutDataset(Dataset):
         return self.length
     
 class CombinedDataLoader:
-    def __init__(self, n_init, n_final, multiplier, hint_steps, batch_size, mode, cut_dataset, one_mixed_dataset=False, desired_reward=1.0, win_only=True):
+    def __init__(self, n_init, n_final, multiplier, hint_steps, batch_size, mode, cut_dataset, one_mixed_dataset=False):
         self.n_init = n_init
         self.n_final = n_final
         self.multiplier = multiplier
         self.hint_steps = hint_steps
         self.batch_size = batch_size
         self.mode = mode
-        self.desired_reward = desired_reward
-        self.win_only = win_only
         self.cut_dataset = cut_dataset
         self.one_mixed_dataset = one_mixed_dataset
         self.dataset = self._generate_combined_dataset()
@@ -131,8 +129,8 @@ class CombinedDataLoader:
         train_dataset = TMaze_dataset(path, gamma, mode, max_length)
         return train_dataset
 
-    def _get_segment_dataloaders(self, N, multiplier, hint_steps, maxN, mode, desired_reward=1.0, win_only=True):
-        name = f'new_tmaze_data_segment_{N}_multiplier_{multiplier}_hint_steps_{hint_steps}_desired_reward_{desired_reward}_win_only_{win_only}'
+    def _get_segment_dataloaders(self, N, multiplier, hint_steps, maxN, mode):
+        name = f'new_tmaze_data_segment_{N}_multiplier_{multiplier}_hint_steps_{hint_steps}'
         data_path = f'TMaze_new/TMaze_new_data/{name}.pickle'
         #data_path = f'../RMDT/TMaze/TMaze_curriculum/TMaze_curriculum_data/{name}.pickle'
 
@@ -142,27 +140,19 @@ class CombinedDataLoader:
 
     def _generate_combined_dataset(self):
         if self.one_mixed_dataset == False:
-            dataset = self._get_segment_dataloaders(N=self.n_init, multiplier=self.multiplier, hint_steps=self.hint_steps, 
-                                                    maxN=self.n_final, mode=self.mode, desired_reward=self.desired_reward,
-                                                    win_only=self.win_only)
-            for N in range(self.n_init+1, self.n_final + 1):
+            dataset = self._get_segment_dataloaders(N=self.n_init, multiplier=self.multiplier, hint_steps=self.hint_steps, maxN=self.n_final, mode=self.mode)
+            for N in range(self.n_init+1, self.n_final+1):
 
                 if self.cut_dataset:
                     dataset = CutDataset(dataset)
 
-                dataset_new = self._get_segment_dataloaders(N=N, multiplier=self.multiplier, hint_steps=self.hint_steps, 
-                                                            maxN=self.n_final, mode=self.mode, desired_reward=self.desired_reward,
-                                                            win_only=self.win_only)
+                dataset_new = self._get_segment_dataloaders(N=N, multiplier=self.multiplier, hint_steps=self.hint_steps, maxN=self.n_final, mode=self.mode)
                 dataset = ConcatDataset([dataset, dataset_new])
                 
         elif self.one_mixed_dataset == True:
-            dataset = self._get_segment_dataloaders(N=self.n_init, multiplier=self.multiplier, hint_steps=self.hint_steps, 
-                                                    maxN=self.n_final, mode=self.mode, desired_reward=self.desired_reward,
-                                                    win_only=self.win_only)
-            for N in range(2, self.n_final + 1):
-                dataset_new = self._get_segment_dataloaders(N=N, multiplier=self.multiplier, hint_steps=self.hint_steps, 
-                                                            maxN=self.n_final, mode=self.mode, desired_reward=self.desired_reward,
-                                                            win_only=self.win_only)
+            dataset = self._get_segment_dataloaders(N=self.n_init, multiplier=self.multiplier, hint_steps=self.hint_steps, maxN=self.n_final, mode=self.mode)
+            for N in range(2, self.n_final+1):
+                dataset_new = self._get_segment_dataloaders(N=N, multiplier=self.multiplier, hint_steps=self.hint_steps, maxN=self.n_final, mode=self.mode)
                 dataset = ConcatDataset([dataset, dataset_new])
 
         return dataset
@@ -179,7 +169,7 @@ class CombinedDataLoader:
 
 
 
-def generate_trajectory(episode_timeout, corridor_length, hint_steps, win, seed_env, seed_noise, desired_reward=1.0): 
+def generate_trajectory(episode_timeout, corridor_length, hint_steps, win, seed_env, seed_noise): 
     """
     seed_env: 0 -> down, 1 -> up
     Returns:
@@ -189,13 +179,13 @@ def generate_trajectory(episode_timeout, corridor_length, hint_steps, win, seed_
     """
     # Initialization:
     np.random.seed(seed_env)
-    env = TMazeClassicPassive(episode_length=episode_timeout, corridor_length=corridor_length, penalty=0, goal_reward=desired_reward) # return {x, y, hint}
+    env = TMazeClassicPassive(episode_length=episode_timeout, corridor_length=corridor_length, penalty=0) # return {x, y, hint}
     obs = env.reset() # {x, y, hint}
     np.random.seed(seed_noise)
     obs = np.concatenate((obs, np.array([0]))) # {x, y, hint, flag}
     obs = np.concatenate((obs, np.array([np.random.randint(low=-1, high=1+1)]))) # {x, y, hint, flag, noise}
     done = False
-    DESIRED_REWARD = desired_reward
+    DESIRED_REWARD = 1.0
     rtg = DESIRED_REWARD
     obss, acts, rtgs, dones, trajectories = [], [], [rtg], [], []
     
@@ -247,9 +237,9 @@ def generate_trajectory(episode_timeout, corridor_length, hint_steps, win, seed_
     return np.array(obss)[:, 1:], np.array(acts), np.array(rtgs), np.array(dones) #[:, 1:]
 
 
-def generate_dict_with_trajectories(segments, multiplier, hint_steps, desired_reward=1.0, win_only=True):
+def generate_dict_with_trajectories(segments, multiplier, hint_steps):
     current_directory = glob.os.getcwd()
-    name = f'new_tmaze_data_segment_{segments}_multiplier_{multiplier}_hint_steps_{hint_steps}_desired_reward_{desired_reward}_win_only_{win_only}'
+    name = f'new_tmaze_data_segment_{segments}_multiplier_{multiplier}_hint_steps_{hint_steps}'
     data_path = current_directory + '/TMaze_new/TMaze_new_data/'
     isExist = os.path.exists(data_path)
     save_path = data_path + f"{name}.pickle"
@@ -262,25 +252,12 @@ def generate_dict_with_trajectories(segments, multiplier, hint_steps, desired_re
 
     data = {}
     iteration = 0
-    if win_only:
-        for seed_env in [0, 1]:
-            for seed_noise in tqdm(range(multiplier)):
-                obss, acts, rtgs, dones = generate_trajectory(episode_timeout=30*segments, corridor_length=30*segments-2, 
-                                                            hint_steps=hint_steps, win=True, seed_env=seed_env, seed_noise=seed_noise, desired_reward=desired_reward)
-                data[iteration] = {'obs': obss, 'action': acts, 'rtg': rtgs, 'done': dones}
-                iteration += 1
-    else:
-        for seed_env in [0, 1]:
-            for seed_noise in tqdm(range(multiplier//2)):
-                obss, acts, rtgs, dones = generate_trajectory(episode_timeout=30*segments, corridor_length=30*segments-2, 
-                                                            hint_steps=hint_steps, win=True, seed_env=seed_env, seed_noise=seed_noise, desired_reward=desired_reward)
-                data[iteration] = {'obs': obss, 'action': acts, 'rtg': rtgs, 'done': dones}
-                iteration += 1
-            for seed_noise in tqdm(range(multiplier//2, multiplier)):
-                obss, acts, rtgs, dones = generate_trajectory(episode_timeout=30*segments, corridor_length=30*segments-2, 
-                                                            hint_steps=hint_steps, win=False, seed_env=seed_env, seed_noise=seed_noise, desired_reward=desired_reward)
-                data[iteration] = {'obs': obss, 'action': acts, 'rtg': rtgs, 'done': dones}
-                iteration += 1
+    for seed_env in [0, 1]:
+        for seed_noise in tqdm(range(multiplier)):
+            obss, acts, rtgs, dones = generate_trajectory(episode_timeout=30*segments, corridor_length=30*segments-2, 
+                                                          hint_steps=hint_steps, win=True, seed_env=seed_env, seed_noise=seed_noise)
+            data[iteration] = {'obs': obss, 'action': acts, 'rtg': rtgs, 'done': dones}
+            iteration += 1
 
     with open(save_path,'wb') as f:
             pickle.dump(data, f)

@@ -88,7 +88,7 @@ for dir in */; do
         new_string="${new_string%_}"
         new_string_no_run="${new_string%_*}"
 
-        python3 TMaze_new/TMaze_new_src/inference_tmaze.py --model_mode "${mode%/}" --max_n_final 9 --ckpt_name "${dir%/}" --ckpt_chooser 0 --ckpt_folder "${ckpt_folder%/}" --arch_mode "${arch_mode%/}"
+        python3 TMaze_new/TMaze_new_src/inference_tmaze_light.py --model_mode "${mode%/}" --max_n_final 9 --ckpt_name "${dir%/}" --ckpt_chooser 0 --ckpt_folder "${ckpt_folder%/}" --arch_mode "${arch_mode%/}"
     fi
 
     cd "$ckpt_dir"

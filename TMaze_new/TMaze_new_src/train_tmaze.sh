@@ -38,5 +38,5 @@ python3 TMaze_new/TMaze_new_src/train_rmdt_new.py --model_mode 'DT' --max_n_fina
 # TMaze_new/TMaze_new_src/train_tmaze.sh
 
 
-#~/Name/REPOSITORIES/RMDT$ python3 TMaze_new/TMaze_new_src/inference_tmaze.py --model_mode 'DT' --max_n_final 9 --ckpt_name 'loss_all_inf_on_9_segments_DT_min_1_max_9_RUN_10_2024_01_03_04_45_02' 
+#~/Egor_C/REPOSITORIES/RMDT$ python3 TMaze_new/TMaze_new_src/inference_tmaze.py --model_mode 'DT' --max_n_final 9 --ckpt_name 'loss_all_inf_on_9_segments_DT_min_1_max_9_RUN_10_2024_01_03_04_45_02' 
 #--ckpt_chooser 0 

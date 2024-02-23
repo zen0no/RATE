@@ -94,8 +94,11 @@ config = {
     "curriculum": True,
     "use_erl_stop": True,
     "online_inference": False,
-    "arctitecture_mode": arch_mode
+    "arctitecture_mode": arch_mode,
 
+    # environment parameters
+    "desired_reward": 4.0, # defalt: 1.0
+    "win_only": False   # default: True
 }
 
 """ ARCHITECTURE MODE """
@@ -216,7 +219,7 @@ def get_returns_TMaze(model, ret, seed, episode_timeout, corridor_length, contex
     channels = 5
     max_ep_len = episode_timeout
 
-    env = TMazeClassicPassive(episode_length=episode_timeout, corridor_length=corridor_length, penalty=0, seed=seed)
+    env = TMazeClassicPassive(episode_length=episode_timeout, corridor_length=corridor_length, penalty=0, seed=seed, goal_reward=ret)
     state = env.reset() # {x, y, hint}
     np.random.seed(seed)
     where_i = state[0]
@@ -429,12 +432,12 @@ for segments in [1, 2, 3, 5, 7, 9, 12]:
         corridor_length = 30*segments - 2
         create_video = False
  
-        episode_return, act_list, t, states, _, attn_map = get_returns_TMaze(model=model, ret=1.0, seed=seed, 
+        episode_return, act_list, t, states, _, attn_map = get_returns_TMaze(model=model, ret=config["desired_reward"], seed=seed, 
                                                                             episode_timeout=episode_timeout, corridor_length=corridor_length, 
                                                                             context_length=config["context_length"], 
                                                                             device=device, act_dim=config["act_dim"], 
                                                                             config=config, create_video=create_video)
-        rets.append(episode_return)
+        rets.append(int(episode_return == config["desired_reward"]))
 
     segmentss.append(segments)
     means.append(np.mean(rets))

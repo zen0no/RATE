@@ -42,6 +42,7 @@ def set_seed(seed):
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = True
     
+
 @torch.no_grad()
 def sample(model, x, block_size, steps, sample=False, top_k=None, actions=None, rtgs=None, timestep=None, mem_tokens=1, saved_context=None):
     
@@ -108,9 +109,6 @@ def get_returns_TMaze(model, ret, seed, episode_timeout, corridor_length, contex
     prompt_steps = 0# 5
     act = None
     act_list= []
-
-    switcher = False
-    saved_mem = None
     
 
     for t in range(max_ep_len):
@@ -118,45 +116,23 @@ def get_returns_TMaze(model, ret, seed, episode_timeout, corridor_length, contex
         rewards = torch.cat([rewards, torch.zeros(1, device=device)])
         
         act_new_segment = False
-        if config["model_mode"] != 'DT':
-            if actions.shape[0] > HISTORY_LEN:
-                segment+=1
+        if actions.shape[0] > HISTORY_LEN:
+            segment+=1
+            
+            if prompt_steps==0:
+                actions = actions[-1:,:]
+                states = states[:, -1:, :]
+                target_return = target_return[:,-1:]
                 
-                if prompt_steps==0:
-                    actions = actions[-1:,:]
-                    states = states[:, -1:, :]
-                    target_return = target_return[:,-1:]
-                    
-                if t%(context_length)==0:# and t > context_length:
-                    # print(states)
-                    if create_video:
-                        out = torch.norm(mem_tokens).item() if mem_tokens is not None else None
-                        #out = new_notes[0] if new_notes is not None else None
-                        print(f't: {t}, NEW MEMORY: {out}')
-                        
-                    mem_tokens = new_mem
-                    # !!!
-                    #mem_tokens = saved_mem
-                    saved_context = new_notes
-                
-        else:
-            if actions.shape[0] > HISTORY_LEN:
-                segment+=1
-                
-                if prompt_steps==0:
-                    actions = actions[1:,:]
-                    states = states[:, 1:, :]
-                    target_return = target_return[:,1:]
-                    
-                if t%(context_length)==0:# and t > context_length:
-                    # print(states)
-                    if create_video:
-                        out = torch.norm(mem_tokens).item() if mem_tokens is not None else None
-                        #out = new_notes[0] if new_notes is not None else None
-                        print(f't: {t}, NEW MEMORY: {out}')
-                    mem_tokens = new_mem
-                    saved_context = new_notes
-                
+            if t%(context_length)==0:# and t > context_length:
+                # print(states)
+                if create_video:
+                    out = torch.norm(mem_tokens).item() if mem_tokens is not None else None
+                    #out = new_notes[0] if new_notes is not None else None
+                    print(f't: {t}, NEW MEMORY: {out}')
+                mem_tokens = new_mem
+                saved_context = new_notes
+            
         if t==0:
             act_to_pass = None
         else:
@@ -171,17 +147,12 @@ def get_returns_TMaze(model, ret, seed, episode_timeout, corridor_length, contex
                                                         sample=True, 
                                                         actions=act_to_pass, 
                                                         rtgs=target_return.unsqueeze(-1), 
-                                                        mem_tokens=mem_tokens, #+torch.randn_like(mem_tokens), # !!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                                                        mem_tokens=mem_tokens, 
                                                         saved_context=saved_context)
-        
-        # !!!!!!!
-        if t > 0 and t % (context_length-1) == 0 and switcher == False:
-            switcher = True
-            saved_mem = new_mem
 
         
-        #act = np.random.choice([0, 1, 2, 3], p=torch.softmax(sampled_action, dim=-1).squeeze().detach().cpu().numpy())
-        act = torch.argmax(torch.softmax(sampled_action, dim=-1).squeeze()).item()
+
+        act = np.random.choice([0, 1, 2, 3], p=torch.softmax(sampled_action, dim=-1).squeeze().detach().cpu().numpy())
         if create_video:
             print(t, "act", act, np.round(torch.softmax(sampled_action, dim=-1).squeeze().detach().cpu().numpy(), 3), "\tstate:", int(where_i), states[:, -1:, :].detach().cpu().numpy())
         actions[-1, :] = act

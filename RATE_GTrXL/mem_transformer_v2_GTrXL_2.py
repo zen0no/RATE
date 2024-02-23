@@ -43,9 +43,7 @@ class MemTransformerLM(nn.Module):
                  sample_softmax=-1,
                  max_ep_len=1000,
                  num_classes_ass_ret=16,
-                 mode='mujoco',
-                 use_gate=False,
-                 use_stable_version=False):
+                 mode='mujoco'):
         
         super(MemTransformerLM, self).__init__()
         
@@ -55,9 +53,9 @@ class MemTransformerLM(nn.Module):
         # qkw_norm = False
 
         # * GATED RATE
-        # use_gate = False
-        # use_stable_version = False
-        qkw_norm = pre_lnorm
+        use_gate = False
+        use_stable_version = False
+        qkw_norm = False
 
         # * CLASSIC RATE
         # use_gate = True
@@ -168,7 +166,6 @@ class MemTransformerLM(nn.Module):
         if attn_type == 0: # the default attention
             for i in range(n_layer):
                 self.layers.append(
-                    # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                     RelPartialLearnableDecoderLayer(
                         n_head, d_model, d_head, d_inner, dropout,
                         tgt_len=tgt_len, ext_len=ext_len, mem_len=mem_len,
@@ -176,21 +173,6 @@ class MemTransformerLM(nn.Module):
                         qkw_norm=qkw_norm,# !
                         dropatt=dropatt, pre_lnorm=pre_lnorm)
                 )
-        # elif attn_type == 1: # learnable embeddings
-        #     for i in range(n_layer):
-        #         self.layers.append(
-        #             RelLearnableDecoderLayer(
-        #                 n_head, d_model, d_head, d_inner, dropout,
-        #                 tgt_len=tgt_len, ext_len=ext_len, mem_len=mem_len,
-        #                 dropatt=dropatt, pre_lnorm=pre_lnorm)
-        #         )
-        # elif attn_type in [2, 3]: # absolute embeddings
-        #     for i in range(n_layer):
-        #         self.layers.append(
-        #             DecoderLayer(
-        #                 n_head, d_model, d_head, d_inner, dropout,
-        #                 dropatt=dropatt, pre_lnorm=pre_lnorm)
-        #         )
 
         self.sample_softmax = sample_softmax
         # use sampled softmax
