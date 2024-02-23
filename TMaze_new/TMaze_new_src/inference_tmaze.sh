@@ -5,7 +5,7 @@
 # for dir in */; do
 #     echo "${dir%/}"
 #     cd
-#     cd Egor_C/REPOSITORIES/RATE
+#     cd Name/REPOSITORIES/RATE
 #     if [[ "$dir" == *_DT_* ]]; then
 #         python3 TMaze_new/TMaze_new_src/inference_tmaze.py --model_mode 'DT' --max_n_final 9 --ckpt_name "${dir%/}" --ckpt_chooser 0
 #     else
@@ -18,7 +18,7 @@
 # for dir in */; do
 #     echo "${dir%/}"
 #     cd
-#     cd Egor_C/REPOSITORIES/RATE
+#     cd Name/REPOSITORIES/RATE
     
 #     if [[ "$dir" == *_RATE_* ]]; then
 #         python3 TMaze_new/TMaze_new_src/inference_tmaze.py --model_mode 'RATE' --max_n_final 9 --ckpt_name "${dir%/}" --ckpt_chooser 0
@@ -107,5 +107,5 @@ find -type f -name "*_${mode%/}_*" ! -name '*FINAL*' -delete
 cd $OLDPWD
 
 
-# ~/Egor_C/REPOSITORIES/RATE$ TMaze_new/TMaze_new_src/inference_tmaze.sh
+# ~/Name/REPOSITORIES/RATE$ TMaze_new/TMaze_new_src/inference_tmaze.sh
 # TMaze_new/TMaze_new_src/inference_tmaze.sh -c 'DT_RATE_GRATE' -m 'RATE' -a 'TrXL'

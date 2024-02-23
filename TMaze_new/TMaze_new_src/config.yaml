@@ -1,6 +1,6 @@
 wandb_config:
     project_name: "RATE_TMaze"
-    wwandb: False
+    wwandb: True
 
 data_config:
   # noise augmentation of data
