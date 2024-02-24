@@ -1,0 +1,4 @@
+Unnamed: 0,Unnamed: 1,Unnamed: 2,1,Unnamed: 4,2,Unnamed: 6,3,Unnamed: 8,5,Unnamed: 10,7,Unnamed: 12,9,Unnamed: 14,12,Unnamed: 16
+model name,RUN,"checkpoint 
+step",mean (R),std (R),mean (R),std (R),mean (R),std (R),mean (R),std (R),mean (R),std (R),mean (R),std (R),mean (R),std (R)
+_arch_mode_TrXL_RATE_min_1_max_1_RUN_2_2024_02_24_22_36_06,2,_save_KTD.pth,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0

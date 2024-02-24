@@ -1,6 +1,6 @@
 wandb_config:
     project_name: "RATE_TMaze"
-    wwandb: False
+    wwandb: True
 
 data_config:
   # noise augmentation of data
@@ -12,7 +12,7 @@ data_config:
   # reward on succesful completion of an episode
   desired_reward: 1.0 # defalt: 1.0
   # adding only succesful trajectories to the dataset
-  win_only: False # default: True
+  win_only: True # default: True
 
 training_config:
   learning_rate: 0.0001 # 1e-4
@@ -21,7 +21,7 @@ training_config:
   warmup_steps: 50  # 100
   grad_norm_clip: 1.0 # 0.25 
   context_length: 30
-  epochs: 1 #250
+  epochs: 250 #250
   use_erl_stop: True
   # inference during training
   online_inference: False

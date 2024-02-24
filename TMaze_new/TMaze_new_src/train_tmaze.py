@@ -21,8 +21,6 @@ os.environ["MKL_NUM_THREADS"] = "1"
 os.environ["NUMEXPR_NUM_THREADS"] = "1" 
 os.environ["OMP_NUM_THREADS"] = "1" 
 
-
-
 with open("TMaze_new/TMaze_new_src/config.yaml") as f:
     config = yaml.load(f, Loader=yaml.FullLoader)
     

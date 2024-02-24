@@ -12,10 +12,8 @@ import sys
 current_dir = os.path.dirname(__file__)
 parent_dir = os.path.dirname(current_dir)
 parent_dir = os.path.dirname(parent_dir)
+parent_dir = os.path.dirname(parent_dir)
 sys.path.append(parent_dir)
-
-OMP_NUM_THREADS = '1'
-os.environ['OMP_NUM_THREADS'] = OMP_NUM_THREADS 
 
 from RATE_GTrXL import mem_transformer_v2_GTrXL
 from TMaze_new.TMaze_new_src.inference.val_tmaze import get_returns_TMaze
@@ -120,7 +118,7 @@ if __name__ == '__main__':
     segmentss, means, stds = [], [], []
     for segments in [1, 2, 3, 5, 7, 9, 12]:
         rets = []
-        for seed in tqdm(seeds_list[::100]):
+        for seed in tqdm(seeds_list):
             episode_timeout = 30*segments
             corridor_length = 30*segments - 2
             create_video = False

@@ -6,3 +6,4 @@ parent_dir = os.path.dirname(parent_dir)
 sys.path.append(parent_dir)
 
 from .val_tmaze import *
+from .inference_tmaze import *
