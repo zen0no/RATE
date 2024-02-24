@@ -4,14 +4,14 @@
 - [ ] Memory Maze (TBD)
 
 ## TMaze 
-###To reproduce experiments:
+### To reproduce experiments:
 ```bash
 find . -type f -name "*\.sh" -exec chmod +x {} \;
 TMaze_new/TMaze_new_src/run/train_tmaze_DT.sh
 TMaze_new/TMaze_new_src/run/train_tmaze_RATE.sh
 TMaze_new/TMaze_new_src/run/train_tmaze_GRATE.sh
 ```
-###To make individual run:
+### To make individual run:
 * `model_mode`: DT, RATE, DTXL or RATEM (RMT);
 * `arch_mode`: TrXL, TrXL-I or GTrXL;
 * `curr`: use of curriculum learning during training.
