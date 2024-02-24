@@ -205,12 +205,11 @@ DIGITS = [
 ]
 
 def stretch_array(array, target_shape):
-    # Проверяем входные данные
     if not isinstance(array, np.ndarray):
-        raise ValueError("Переданный объект не является массивом NumPy")
+        raise ValueError("Object is not np")
 
     if len(array.shape) != len(target_shape):
-        raise ValueError("Число измерений не совпадает")
+        raise ValueError("Can't match dimentions")
 
     scale_factor = [target_dim // src_dim for target_dim, src_dim in zip(target_shape, array.shape)]
     stretched_array = np.repeat(array, scale_factor[0], axis=0)
