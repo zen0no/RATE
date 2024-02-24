@@ -1,0 +1,14 @@
+Unnamed: 0,Unnamed: 1,Unnamed: 2,1,Unnamed: 4,2,Unnamed: 6,3,Unnamed: 8,5,Unnamed: 10,7,Unnamed: 12,9,Unnamed: 14,12,Unnamed: 16
+model name,RUN,"checkpoint 
+step",mean (R),std (R),mean (R),std (R),mean (R),std (R),mean (R),std (R),mean (R),std (R),mean (R),std (R),mean (R),std (R)
+_arch_mode_TrXL_RATE_min_1_max_1_RUN_1_2024_02_24_21_21_22,1,_save_KTD.pth,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+_arch_mode_TrXL_RATE_min_1_max_1_RUN_2_2024_02_24_21_21_28,2,_save_KTD.pth,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+_arch_mode_TrXL_RATE_min_1_max_1_RUN_3_2024_02_24_21_21_32,3,_save_KTD.pth,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+_arch_mode_TrXL_RATE_min_1_max_1_RUN_4_2024_02_24_21_21_36,4,_save_KTD.pth,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+_arch_mode_TrXL_RATE_min_1_max_1_RUN_5_2024_02_24_21_21_40,5,_save_KTD.pth,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+_arch_mode_TrXL_RATE_min_1_max_1_RUN_6_2024_02_24_21_21_44,6,_save_KTD.pth,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+_arch_mode_TrXL_RATE_min_1_max_1_RUN_7_2024_02_24_21_21_48,7,_save_KTD.pth,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+_arch_mode_TrXL_RATE_min_1_max_1_RUN_8_2024_02_24_21_21_52,8,_save_KTD.pth,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+_arch_mode_TrXL_RATE_min_1_max_1_RUN_9_2024_02_24_21_21_56,9,_save_KTD.pth,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+_arch_mode_TrXL_RATE_min_1_max_1_RUN_10_2024_02_24_21_22_00,10,_save_KTD.pth,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+,,,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0

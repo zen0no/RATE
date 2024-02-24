@@ -7,6 +7,6 @@
 *.pyc
 !requirements.txt *.txt
 *.ipynb_checkpoints
-*.csv
+!table_empty.csv *.csv
 wandb/
 __pycache__/

@@ -1,51 +1,6 @@
 #!/bin/bash
 
-# #DT + RATE
-# cd TMaze_new/TMaze_new_checkpoints/GTrXL
-# for dir in */; do
-#     echo "${dir%/}"
-#     cd
-#     cd Name/REPOSITORIES/RATE
-#     if [[ "$dir" == *_DT_* ]]; then
-#         python3 TMaze_new/TMaze_new_src/inference_tmaze.py --model_mode 'DT' --max_n_final 9 --ckpt_name "${dir%/}" --ckpt_chooser 0
-#     else
-#         python3 TMaze_new/TMaze_new_src/inference_tmaze.py --model_mode 'RATE' --max_n_final 9 --ckpt_name "${dir%/}" --ckpt_chooser 0
-#     fi
-#     cd TMaze_new/TMaze_new_checkpoints/GTrXL
-# done
-
-# cd TMaze_new/TMaze_new_checkpoints/GTrXL
-# for dir in */; do
-#     echo "${dir%/}"
-#     cd
-#     cd Name/REPOSITORIES/RATE
-    
-#     if [[ "$dir" == *_RATE_* ]]; then
-#         python3 TMaze_new/TMaze_new_src/inference_tmaze.py --model_mode 'RATE' --max_n_final 9 --ckpt_name "${dir%/}" --ckpt_chooser 0
-#     fi
-
-#     cd TMaze_new/TMaze_new_checkpoints/GTrXL
-# done
-
-
-
-# while getopts ":c:" opt; do
-#   case $opt in
-#     c)
-#       ckpt_folder="$OPTARG"
-#       ;;
-#     \?)
-#       echo "Invalid option: -$OPTARG" >&2
-#       exit 1
-#       ;;
-#     :)
-#       echo "Option -$OPTARG requires an argument." >&2
-#       exit 1
-#       ;;
-#   esac
-# done
-
-while getopts ":c:m:a:" opt; do
+while getopts ":c:m:a:s:" opt; do
   case $opt in
     c)
       ckpt_folder="$OPTARG"
@@ -55,6 +10,9 @@ while getopts ":c:m:a:" opt; do
       ;;
     a)
       arch_mode="$OPTARG"
+      ;;
+    s)
+      max_segments="OPTARG"
       ;;
     \?)
       echo "Invalid option: -$OPTARG" >&2
@@ -77,8 +35,7 @@ for dir in */; do
     echo Current directory: "${dir%/}"
     cd $OLDPWD
     
-    #if [[ "$dir" == *_"${mode%/}"_* ]]; then
-    if [[ "$dir" == *_"${mode%/}"_* && "$dir" == *"max_3"* && "$dir" == *_"${arch_mode%/}"_* ]]; then
+    if [[ "$dir" == *_"${mode%/}"_* && "$dir" == *"${mode%/}"* && "$dir" == *_"${arch_mode%/}"_* ]]; then
         string="${dir%/}"
         string_no_data="${string%_*_*_*_*_*_*_*}"
         new_string=""
@@ -88,7 +45,12 @@ for dir in */; do
         new_string="${new_string%_}"
         new_string_no_run="${new_string%_*}"
 
-        python3 TMaze_new/TMaze_new_src/inference/inference_tmaze.py --model_mode "${mode%/}" --max_n_final 9 --ckpt_name "${dir%/}" --ckpt_chooser 0 --ckpt_folder "${ckpt_folder%/}" --arch_mode "${arch_mode%/}"
+        python3 TMaze_new/TMaze_new_src/inference_tmaze.py --model_mode "${mode%/}" \
+                                                           --max_n_final 12 \
+                                                           --ckpt_name "${dir%/}" \
+                                                           --ckpt_chooser 0 \
+                                                           --ckpt_folder "${ckpt_folder%/}" \
+                                                           --arch_mode "${arch_mode%/}"
     fi
 
     cd "$ckpt_dir"
@@ -108,4 +70,4 @@ cd $OLDPWD
 
 
 # ~/Name/REPOSITORIES/RATE$ TMaze_new/TMaze_new_src/inference_tmaze.sh
-# TMaze_new/TMaze_new_src/inference_tmaze.sh -c 'DT_RATE_GRATE' -m 'RATE' -a 'TrXL'
+# TMaze_new/TMaze_new_src/inference_tmaze.sh -c 'DT_RATE_GRATE' -m 'RATE' -a 'TrXL' -s 'max_1'

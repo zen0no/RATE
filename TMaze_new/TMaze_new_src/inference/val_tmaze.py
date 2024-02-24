@@ -152,7 +152,7 @@ def get_returns_TMaze(model, ret, seed, episode_timeout, corridor_length, contex
         #print(reward, done)
         
         ################################################################################################### TEN OF HINTS
-        if t < config["hint_steps"]-1:
+        if t < config["data_config"]["hint_steps"]-1:
             state[2] = mem_state2[2]
         ################################################################################################################
         

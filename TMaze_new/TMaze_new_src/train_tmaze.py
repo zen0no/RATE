@@ -29,13 +29,14 @@ with open("TMaze_new/TMaze_new_src/config.yaml") as f:
 def create_args():
     parser = argparse.ArgumentParser(description='Description of your program')
 
-    parser.add_argument('--model_mode',     type=str, default='RATE', help='Model training mode. Available variants: "DT, DTXL, RATE (Ours), RATEM (RMT)"')    
-    parser.add_argument('--arch_mode',      type=str, default='TrXL', help='Model architecture mode. Available variants: "TrXL", "TrXL-I", "GTrXL"')
-    parser.add_argument('--min_n_final',    type=int, default=1,      help='Start number of considered segments during training')
-    parser.add_argument('--max_n_final',    type=int, default=3,      help='End number of considered segments during training')
-    parser.add_argument('--start_seed',     type=int, default=1,      help='Start seed')
-    parser.add_argument('--end_seed',       type=int, default=10,     help='End seed')
-    parser.add_argument('--curr',           type=str, default='true', help='Curriculum mode. If "true", then curriculum will be used during training')
+    parser.add_argument('--model_mode',     type=str, default='RATE',  help='Model training mode. Available variants: "DT, DTXL, RATE (Ours), RATEM (RMT)"')    
+    parser.add_argument('--arch_mode',      type=str, default='TrXL',  help='Model architecture mode. Available variants: "TrXL", "TrXL-I", "GTrXL"')
+    parser.add_argument('--min_n_final',    type=int, default=1,       help='Start number of considered segments during training')
+    parser.add_argument('--max_n_final',    type=int, default=3,       help='End number of considered segments during training')
+    parser.add_argument('--start_seed',     type=int, default=1,       help='Start seed')
+    parser.add_argument('--end_seed',       type=int, default=10,      help='End seed')
+    parser.add_argument('--curr',           type=str, default='true',  help='Curriculum mode. If "true", then curriculum will be used during training')
+    parser.add_argument('--ckpt_folder',    type=str, default='ckpt',  help='Checkpoints directory')
 
     return parser
 
@@ -51,6 +52,7 @@ if __name__ == '__main__':
     curr = args.curr
     min_n_final = args.min_n_final
     max_n_final = args.max_n_final
+    ckpt_folder = args.ckpt_folder
 
     config["training_config"]["max_segments"] = max_n_final
     config["online_inference_config"]["episode_timeout"] = max_n_final*30
@@ -102,7 +104,7 @@ if __name__ == '__main__':
         name = f'{TEXT_DESCRIPTION}_{mini_text}_{config["model_mode"]}_min_{min_n_final}_max_{max_n_final}_RUN_{RUN}_{date_time}'
         current_dir = os.getcwd()
         current_folder = os.path.basename(current_dir)
-        ckpt_path = f'../{current_folder}/TMaze_new/TMaze_new_checkpoints/trash/{name}/'
+        ckpt_path = f'../{current_folder}/TMaze_new/TMaze_new_checkpoints/{ckpt_folder}/{name}/'
         isExist = os.path.exists(ckpt_path)
         if not isExist:
             os.makedirs(ckpt_path)

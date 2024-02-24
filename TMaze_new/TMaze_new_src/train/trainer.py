@@ -89,7 +89,7 @@ def train(model, optimizer, scheduler, raw_model, new_segment, epochs_counter, s
                     t1 = timesteps[:, from_idx:to_idx].to(device)
                     masks1 = masks[:, from_idx:to_idx].to(device)
                 # print('2', x1.shape)
-                if block_part == list(range(EFFECTIVE_SIZE_BLOCKS//BLOCKS_CONTEXT))[-1] or config["model_config"]["model_mode"] == 'DT':
+                if block_part == list(range(EFFECTIVE_SIZE_BLOCKS//BLOCKS_CONTEXT))[-1] or config["model_mode"] == 'DT':
                     model.flag = 1 
                 else:
                     model.flag = 0
@@ -164,7 +164,7 @@ def train(model, optimizer, scheduler, raw_model, new_segment, epochs_counter, s
                         masks1 = masks[:, from_idx:to_idx].to(device)
                         
                     #print('4', x1.shape)
-                    if block_part == list(range(EFFECTIVE_SIZE_BLOCKS//BLOCKS_CONTEXT))[-1] or config["model_config"]["model_mode"] == 'DT':
+                    if block_part == list(range(EFFECTIVE_SIZE_BLOCKS//BLOCKS_CONTEXT))[-1] or config["model_mode"] == 'DT':
                         model.flag = 1 
                     else:
                         model.flag = 0
