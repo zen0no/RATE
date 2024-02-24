@@ -5,8 +5,10 @@
 *.pickle
 *.gif
 *.pyc
-!requirements.txt *.txt
+ *.txt
+!requirements.txt
 *.ipynb_checkpoints
-!table_empty.csv *.csv
+*.csv
+!table_empty.csv
 wandb/
 __pycache__/
