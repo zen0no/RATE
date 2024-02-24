@@ -5,7 +5,7 @@ import numpy as np
 
 from RATE_GTrXL import mem_transformer_v2_GTrXL
 from TMaze_new.TMaze_new_src.val_tmaze import get_returns_TMaze
-from TMaze_new.TMaze_new_src.additional2 import plot_cringe
+from TMaze_new.TMaze_new_src.utils.additional2 import plot_cringe 
 from TMaze_new.TMaze_new_src.utils import seeds_list
 from TMaze_new.TMaze_new_src.train import FactorScheduler
 

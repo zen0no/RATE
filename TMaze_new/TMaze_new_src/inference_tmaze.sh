@@ -88,7 +88,7 @@ for dir in */; do
         new_string="${new_string%_}"
         new_string_no_run="${new_string%_*}"
 
-        python3 TMaze_new/TMaze_new_src/inference_tmaze.py --model_mode "${mode%/}" --max_n_final 9 --ckpt_name "${dir%/}" --ckpt_chooser 0 --ckpt_folder "${ckpt_folder%/}" --arch_mode "${arch_mode%/}"
+        python3 TMaze_new/TMaze_new_src/inference/inference_tmaze.py --model_mode "${mode%/}" --max_n_final 9 --ckpt_name "${dir%/}" --ckpt_chooser 0 --ckpt_folder "${ckpt_folder%/}" --arch_mode "${arch_mode%/}"
     fi
 
     cd "$ckpt_dir"
@@ -99,7 +99,7 @@ cd $OLDPWD
 
 directory="TMaze_new/TMaze_new_inference/TMaze_new_inference_${location##*/}/$new_string_no_run"
 # echo "${directory%/}"
-python3 TMaze_new/TMaze_new_src/parse_inference_csv.py --directory "${directory%/}" --mode "${mode%/}"
+python3 TMaze_new/TMaze_new_src/utils/parse_inference_csv.py --directory "${directory%/}" --mode "${mode%/}"
 
 cd "$directory"
 #find -type f -name '*_"${mode%/}"_*' -delete

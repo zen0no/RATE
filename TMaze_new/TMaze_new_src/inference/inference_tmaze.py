@@ -19,8 +19,8 @@ os.environ['OMP_NUM_THREADS'] = OMP_NUM_THREADS
 # from RATE_model.RATE import mem_transformer_v2
 from RATE_GTrXL import mem_transformer_v2_GTrXL
 # from RATE_GTrXL import mem_transformer_v2_GTrXL
-from TMaze_new.TMaze_new_src.tmaze_new_dataset import TMaze_data_generator, CombinedDataLoader
-from TMaze_new.TMaze_new_src.additional2 import plot_cringe
+from TMaze_new.TMaze_new_src.utils.tmaze_new_dataset import TMaze_data_generator, CombinedDataLoader
+from TMaze_new.TMaze_new_src.utils.additional2 import plot_cringe 
 from TMaze_new.TMaze_new_src.val_tmaze import get_returns_TMaze
 
 
