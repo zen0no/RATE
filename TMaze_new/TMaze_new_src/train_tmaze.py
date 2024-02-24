@@ -6,7 +6,12 @@ import argparse
 import yaml
 import sys
 
-sys.path.append('././')
+import os
+import sys
+current_dir = os.path.dirname(__file__)
+parent_dir = os.path.dirname(current_dir)
+parent_dir = os.path.dirname(parent_dir)
+sys.path.append(parent_dir)
 
 #from TMaze_new.TMaze_new_src.utils.tmaze_new_dataset import TMaze_data_generator, CombinedDataLoader
 from TMaze_new.TMaze_new_src.utils import set_seed, get_intro, TMaze_data_generator, CombinedDataLoader

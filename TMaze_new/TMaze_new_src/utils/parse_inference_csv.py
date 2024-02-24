@@ -67,14 +67,15 @@ def combine_csv_files(directory, mode):
     return combined_df
 
 
-parser = argparse.ArgumentParser(description='Description of your program')
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Description of your program')
 
-parser.add_argument('--directory', type=str, default='', help='Description of directory argument')
-parser.add_argument('--mode', type=str, default='', help='Description of directory argument')
-args = parser.parse_args()
+    parser.add_argument('--directory', type=str, default='', help='Description of directory argument')
+    parser.add_argument('--mode', type=str, default='', help='Description of directory argument')
+    args = parser.parse_args()
 
-directory = args.directory
-mode = args.mode
+    directory = args.directory
+    mode = args.mode
 
-#directory = 'TMaze_new/TMaze_new_inference/TMaze_new_inference_TrXL_qkw_false_test'
-combine_csv_files(directory, mode)
+    #directory = 'TMaze_new/TMaze_new_inference/TMaze_new_inference_TrXL_qkw_false_test'
+    combine_csv_files(directory, mode)
