@@ -5,7 +5,7 @@
 *.pickle
 *.gif
 *.pyc
-*.txt
+!requirements.txt *.txt
 *.csv
 wandb/
 __pycache__/
