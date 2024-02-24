@@ -9,6 +9,6 @@
 !requirements.txt
 *.ipynb_checkpoints
 *.csv
-!table_empty.csv
+# !table_empty.csv
 wandb/
 __pycache__/
