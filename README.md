@@ -3,6 +3,11 @@
 - [ ] VizDoom (coming soon)
 - [ ] Memory Maze (TBD)
 
+### Installing dependencies:
+```bash
+pip install -r requirements.txt
+```
+
 ## TMaze 
 ### To reproduce experiments:
 ```bash
