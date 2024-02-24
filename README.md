@@ -42,7 +42,7 @@ python3 TMaze_new/TMaze_new_src/train_tmaze.py --model_mode 'RATE' \
 #### Inference
 
 ```bash
-TMaze_new/TMaze_new_src/inference_tmaze.sh -c 'RATE_max_3' -m 'RATE' -a 'TrXL' -s 'max_4'
+TMaze_new/TMaze_new_src/inference_tmaze.sh -c 'RATE_max_3' -m 'RATE' -a 'TrXL' -s 'max_3'
 ```
 
 
