@@ -3,21 +3,20 @@
 - [ ] VizDoom (coming soon)
 - [ ] Memory Maze (TBD)
 
-# TMaze 
-To reproduce experiments:
+## TMaze 
+###To reproduce experiments:
 ```bash
 find . -type f -name "*\.sh" -exec chmod +x {} \;
 TMaze_new/TMaze_new_src/run/train_tmaze_DT.sh
 TMaze_new/TMaze_new_src/run/train_tmaze_RATE.sh
 TMaze_new/TMaze_new_src/run/train_tmaze_GRATE.sh
 ```
-To make individual run:
+###To make individual run:
+* `model_mode`: DT, RATE, DTXL or RATEM (RMT);
+* `arch_mode`: TrXL, TrXL-I or GTrXL;
+* `curr`: use of curriculum learning during training.
 ```bash
-python3 TMaze_new/TMaze_new_src/train_rate.py \
-        --model_mode 'RATE' \
-        --max_n_final 3 \
-        --arch_mode 'TrXL' \
-        --curr 'true'
+python3 TMaze_new/TMaze_new_src/train_rate.py --model_mode 'RATE' --max_n_final 3 --arch_mode 'TrXL' --curr 'true'
 ```
 
 
