@@ -16,7 +16,7 @@ TMaze_new/TMaze_new_src/run/train_tmaze_GRATE.sh
 * `arch_mode`: TrXL, TrXL-I or GTrXL;
 * `curr`: use of curriculum learning during training.
 ```bash
-python3 TMaze_new/TMaze_new_src/train_rate.py --model_mode 'RATE' --max_n_final 3 --arch_mode 'TrXL' --curr 'true'
+python3 TMaze_new/TMaze_new_src/train_tmaze.py --model_mode 'RATE' --max_n_final 3 --arch_mode 'TrXL' --curr 'true'
 ```
 
 
