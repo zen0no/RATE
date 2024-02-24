@@ -1,5 +1,5 @@
 import numpy as np
-from TMaze_new.TMaze_new_src.tmaze import TMazeClassicPassive
+from TMaze_new.TMaze_new_src.utils.tmaze import TMazeClassicPassive
 import glob
 import pickle
 import os

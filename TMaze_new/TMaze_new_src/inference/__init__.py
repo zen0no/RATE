@@ -1,1 +1,1 @@
-from .inference_tmaze import *
+from .val_tmaze import *

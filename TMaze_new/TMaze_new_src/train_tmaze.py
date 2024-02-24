@@ -4,6 +4,9 @@ import wandb
 from torch.utils.data import random_split, DataLoader
 import argparse
 import yaml
+import sys
+
+sys.path.append('././')
 
 #from TMaze_new.TMaze_new_src.utils.tmaze_new_dataset import TMaze_data_generator, CombinedDataLoader
 from TMaze_new.TMaze_new_src.utils import set_seed, get_intro, TMaze_data_generator, CombinedDataLoader

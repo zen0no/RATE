@@ -21,14 +21,13 @@ from RATE_GTrXL import mem_transformer_v2_GTrXL
 # from RATE_GTrXL import mem_transformer_v2_GTrXL
 from TMaze_new.TMaze_new_src.utils.tmaze_new_dataset import TMaze_data_generator, CombinedDataLoader
 from TMaze_new.TMaze_new_src.utils.additional2 import plot_cringe 
-from TMaze_new.TMaze_new_src.val_tmaze import get_returns_TMaze
+from TMaze_new.TMaze_new_src.inference.val_tmaze import get_returns_TMaze
 
 
 from TMaze_new.TMaze_new_src.utils import seeds_list
 
-# Создание парсера аргументов
 parser = argparse.ArgumentParser(description='Description of your program')
-# Добавление аргументов
+
 parser.add_argument('--model_mode', type=str, default='RATE', help='Description of model_name argument')
 parser.add_argument('--max_n_final', type=int, default=3, help='Description of max_n_final argument')
 parser.add_argument('--ckpt_name', type=str, default='checkpoint_name', help='Description of name argument')
@@ -36,7 +35,6 @@ parser.add_argument('--ckpt_chooser', type=int, default=0, help='0 if last else 
 parser.add_argument('--ckpt_folder', type=str, default='', help='0 if last else int')
 parser.add_argument('--arch_mode', type=str, default='TrXL', help='Description of model_name argument')
 
-# Парсинг аргументов командной строки
 args = parser.parse_args()
 model_mode = args.model_mode
 min_n_final = 1
