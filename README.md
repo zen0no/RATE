@@ -10,12 +10,18 @@ pip install -r requirements.txt
 
 ## TMaze 
 ### To reproduce experiments:
+#### Train:
 ```bash
 find . -type f -name "*\.sh" -exec chmod +x {} \;
 TMaze_new/TMaze_new_src/run/train_tmaze_DT.sh
 TMaze_new/TMaze_new_src/run/train_tmaze_RATE.sh
 TMaze_new/TMaze_new_src/run/train_tmaze_GRATE.sh
 ```
+#### Inference:
+```bash
+inf.sh
+```
+
 ### To make individual run:
 * `model_mode`: DT, RATE, DTXL or RATEM (RMT);
 * `arch_mode`: TrXL, TrXL-I or GTrXL;
