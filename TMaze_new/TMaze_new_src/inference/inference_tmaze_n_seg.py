@@ -136,6 +136,6 @@ if __name__ == '__main__':
         means.append(np.mean(rets))
         stds.append(np.std(rets))
 
-        print(f"MODEL: {config['model_mode']}, MODE: {config['architecture_mode']}, MAX_{config['training_config']['max_segments']}")
+        print(f"MODEL: {config['model_mode']}, MODE: {config['arctitecture_mode']}, MAX_{config['training_config']['sections']}")
         print("SEGMENTS", segments, np.mean(rets), np.std(rets), sep='\t')
 
