@@ -4,6 +4,7 @@ wandb_config:
 
 data_config:
   gamma: 1.0
+  normalize: True
 
 training_config:
   learning_rate: 0.001 # 1e-3

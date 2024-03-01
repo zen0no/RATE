@@ -8,3 +8,4 @@ sys.path.append(parent_dir)
 from .get_vizdoom_dataset import *
 from .common_wrappers import *
 from .env_vizdoom2 import *
+from .normalization import *

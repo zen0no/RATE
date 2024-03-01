@@ -3,8 +3,9 @@ import wandb
 from tqdm import tqdm
 
 from RATE_GTrXL import mem_transformer_v2_GTrXL
+from VizDoom.VizDoom_src.utils import z_normalize, inverse_z_normalize
 
-def train(ckpt_path, config, train_dataloader):
+def train(ckpt_path, config, train_dataloader, mean, std):
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
     model = mem_transformer_v2_GTrXL.MemTransformerLM(**config["model_config"])
@@ -42,6 +43,13 @@ def train(ckpt_path, config, train_dataloader):
         model.train()
         for it, batch in enumerate(train_dataloader):
             s, a, rtg, d, timesteps, masks = batch
+            # ! NORMALIZATION
+            if config["data_config"]["normalize"]:
+                _b, _l, _c, _h, _w = s.shape
+                s = s.reshape(_b*_l, _c, _h, _w)
+                s = z_normalize(s, mean, std)
+                s = s.reshape(_b, _l, _c, _h, _w)
+            # ! NORMALIZATION
             #print('1', s.shape)
             memory = None
             mem_tokens=None
@@ -61,7 +69,7 @@ def train(ckpt_path, config, train_dataloader):
                 else:
                     from_idx = block_part*(BLOCKS_CONTEXT)
                     to_idx = (block_part+1)*(BLOCKS_CONTEXT)
-                    x1 = s[:, from_idx:to_idx, :].to(device)
+                    x1 = s[:, from_idx:to_idx, :].to(device) # torch.Size([128, 30, 3, 64, 112])
                     y1 = a[:, from_idx:to_idx, :].to(device).float()
                     r1 = rtg[:,:,:][:, from_idx:to_idx, :].to(device).float() 
                     t1 = timesteps[:, from_idx:to_idx].to(device)

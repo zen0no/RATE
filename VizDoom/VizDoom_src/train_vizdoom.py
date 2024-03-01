@@ -11,8 +11,6 @@ import yaml
 import pickle
 from torch.utils.data import random_split, DataLoader
 
-
-
 import os
 import sys
 current_dir = os.path.dirname(__file__)
@@ -21,8 +19,8 @@ parent_dir = os.path.dirname(parent_dir)
 sys.path.append(parent_dir)
 
 from VizDoom.VizDoom_src.train import train
-from TMaze_new.TMaze_new_src.utils import set_seed, get_intro_vizdoom
-from VizDoom.VizDoom_src.utils.get_vizdoom_dataset import get_dataset
+from TMaze_new.TMaze_new_src.utils import set_seed, get_intro_vizdoom 
+from VizDoom.VizDoom_src.utils import get_dataset, batch_mean_and_std
 
 os.environ["MKL_NUM_THREADS"] = "1" 
 os.environ["NUMEXPR_NUM_THREADS"] = "1"  
@@ -79,6 +77,22 @@ if __name__ == '__main__':
     config["arctitecture_mode"] = arch_mode
     config["training_config"]["sections"] = 3
 
+    #================================================== DATALOADERS CREATION ======================================================#
+    train_dataset = get_dataset(DATA_train, 
+                                gamma=config["data_config"]["gamma"], 
+                                max_length=config["training_config"]["sections"]*config["training_config"]["context_length"], 
+                                normalize=config["data_config"]["normalize"])
+    train_dataloader = DataLoader(train_dataset, 
+                                    batch_size=config["training_config"]["batch_size"], 
+                                    shuffle=True, 
+                                    num_workers=4)
+
+    print(f"Train: {len(train_dataset)}")
+
+    mean, std = batch_mean_and_std(train_dataloader)
+    print("mean and std:", mean, std)
+    #==============================================================================================================================#
+
     # RUN = 1
     for RUN in range(start_seed, end_seed+1):
         set_seed(RUN)
@@ -115,7 +129,7 @@ if __name__ == '__main__':
         print(f"Selected Model: {config['model_mode']}")  
 
 
-        TEXT_DESCRIPTION = "z_norm"
+        TEXT_DESCRIPTION = "good_z_norm"
         mini_text = f"arch_mode_{config['arctitecture_mode']}"
         now = datetime.datetime.now()
         date_time = now.strftime("%Y-%m-%d_%H-%M-%S").replace('-', '_')
@@ -132,20 +146,8 @@ if __name__ == '__main__':
             #run = wandb.init(entity="rmdt", project="VizDoom_clear", name=name, group=group, config=config, save_code=True, reinit=True)
             run = wandb.init(project=config['wandb_config']['project_name'], name=name, group=group, config=config, save_code=True, reinit=True)
 
-        #================================================== DATALOADERS CREATION ======================================================#
-        train_dataset = get_dataset(DATA_train, 
-                                    gamma=config["data_config"]["gamma"], 
-                                    max_length=config["training_config"]["sections"]*config["training_config"]["context_length"], 
-                                    normalize=True)
-        train_dataloader = DataLoader(train_dataset, 
-                                      batch_size=config["training_config"]["batch_size"], 
-                                      shuffle=True, 
-                                      num_workers=4)
-
-        print(f"Train: {len(train_dataset)}")
-        #==============================================================================================================================#
         wandb_step = 0
-        model = train(ckpt_path, config, train_dataloader)
+        model = train(ckpt_path, config, train_dataloader, mean, std)
                 
         if config["wandb_config"]["wwandb"]:
             run.finish()
