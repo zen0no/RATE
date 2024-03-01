@@ -48,25 +48,8 @@ class MemTransformerLM(nn.Module):
                  use_stable_version=False):
         
         super(MemTransformerLM, self).__init__()
-        
-        # * CLASSIC DT
-        # use_gate = False
-        # use_stable_version = False
-        # qkw_norm = False
 
-        # * GATED RATE
-        # use_gate = False
-        # use_stable_version = False
         qkw_norm = pre_lnorm
-
-        # * CLASSIC RATE
-        # use_gate = True
-        # use_stable_version = True
-        # qkw_norm = False
-
-        #use_layer_norm_w = False
-        
-        #self.n_token = n_token
 
         d_embed = d_model if d_embed is None else d_embed
         self.d_embed = d_embed
@@ -302,7 +285,7 @@ class MemTransformerLM(nn.Module):
 
         mlen = mems[0].size(0) if mems is not None else 0
         #mlen = 0
-        #print("mlen", mlen)
+        # print("mlen1", mlen)
         #print(mem_tokens.shape, word_emb.shape)
         # Concat with mem_tokens
         if mem_tokens is not None:
@@ -498,7 +481,9 @@ class MemTransformerLM(nn.Module):
                 token_embeddings[:,::2,:] = rtg_embeddings
                 token_embeddings[:,1::2,:] = state_embeddings
 
-            hidden, new_mems = self._forward(token_embeddings, mems=mems, mem_tokens=mem_tokens) #hidden.shape = (total_len, bs, emb_dim)
+            hidden, new_mems = self._forward(token_embeddings, mems=mems, mem_tokens=mem_tokens) #hidden.shape = (total_len, bs, emb_dim) new_mems[i].shape = (MEM_LEN, bs, d_model)
+            # print("HIDDEN:", hidden.shape)
+            # print("NEW_MEMS", len(new_mems), new_mems[0][0, 0, :5])
             hidden = hidden.permute(1,0,2)
             num_mem = self.num_mem_tokens
             if self.num_mem_tokens > 0:

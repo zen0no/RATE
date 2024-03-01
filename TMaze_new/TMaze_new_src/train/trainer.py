@@ -100,8 +100,10 @@ def train(model, optimizer, scheduler, raw_model, new_segment, epochs_counter, s
                     mem_tokens = raw_model.mem_tokens.repeat(1, r1.shape[0], 1)
                 with torch.set_grad_enabled(is_train):
                     optimizer.zero_grad()
+                    # print('before', memory)
                     res = model(x1, y1, r1, y1, t1, *memory, mem_tokens=mem_tokens, masks=masks1) if memory is not None else model(x1, y1, r1, y1, t1, mem_tokens=mem_tokens, masks=masks1)
                     memory = res[0][2:]
+                    # print("a", len(memory), memory[0].shape, memory[0][0, 0, 0:5])
                     logits, loss = res[0][0], res[0][1]
                     mem_tokens = res[1]
         

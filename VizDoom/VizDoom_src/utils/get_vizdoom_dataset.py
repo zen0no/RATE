@@ -32,7 +32,7 @@ class VisDoomDataset(Dataset):
         """
         discount_cumsum = np.zeros_like(x)
         discount_cumsum[-1] = x[-1]
-        for t in reversed(range(x.shape[0]-1)):
+        for t in reversed(range(x.shape[0] - 1)):
             discount_cumsum[t] = x[t] + self.gamma * discount_cumsum[t+1]
         return discount_cumsum
 
@@ -53,8 +53,12 @@ class VisDoomDataset(Dataset):
         d = self.data['done'][index]
         
         s = torch.from_numpy(s).float()
+        mean = torch.mean(s, dim=[0, 2, 3])
+        std = torch.std(s, dim=[0, 2, 3])
         if self.normalize:
-            s = s / 255.0
+            #s = s / 255.0
+            s = (s - mean[None, :, None, None]) / std[None, :, None, None]
+
         
         s = s.unsqueeze(0)
         a = torch.from_numpy(a).unsqueeze(0).unsqueeze(-1)
