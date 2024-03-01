@@ -1,0 +1,45 @@
+wandb_config:
+    project_name: "RATE_VizDoom"
+    wwandb: False
+
+data_config:
+  gamma: 1.0
+
+training_config:
+  learning_rate: 0.001 # 1e-3
+  weight_decay: 0.1
+  batch_size: 128 # 128
+  warmup_steps: 50  # 50
+  grad_norm_clip: 1.0 # 1.0
+  context_length: 30
+  epochs: 400 #250
+  use_erl_stop: True
+  # inference during training
+  online_inference: False
+
+model_config:
+  mode: "doom"
+  STATE_DIM: 3
+  ACTION_DIM: 1
+  n_token: 10000 # vocab_size
+  n_layer: 3 # 3
+  n_head: 1 # 1
+  d_model: 128 # 128
+  d_head: 128 # 128 # divider of d_model
+  d_inner: 128 # 128 # > d_model
+  dropout: 0.2 # 0.2
+  dropatt: 0.05 # 0.05
+  mem_len: 2
+  ext_len: 1
+  tie_weight: False
+  num_mem_tokens: 5 # 5 d_head * nmt = diff params
+  mem_at_end: True
+
+online_inference_config:
+  episode_timeout:
+  corridor_length:
+
+
+
+
+
