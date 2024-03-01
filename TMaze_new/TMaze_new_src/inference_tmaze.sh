@@ -12,7 +12,7 @@ while getopts ":c:m:a:s:" opt; do
       arch_mode="$OPTARG"
       ;;
     s)
-      max_segments="OPTARG"
+      max_segments="$OPTARG"
       ;;
     \?)
       echo "Invalid option: -$OPTARG" >&2
@@ -35,7 +35,8 @@ for dir in */; do
     echo Current directory: "${dir%/}"
     cd $OLDPWD
     
-    if [[ "$dir" == *_"${mode%/}"_* && "$dir" == *"${mode%/}"* && "$dir" == *_"${arch_mode%/}"_* ]]; then
+    if [[ "$dir" == *_"${mode%/}"_* && "$dir" == *_"${max_segments%/}"_* && "$dir" == *_"${arch_mode%/}"_* ]]; then
+
         string="${dir%/}"
         string_no_data="${string%_*_*_*_*_*_*_*}"
         new_string=""
