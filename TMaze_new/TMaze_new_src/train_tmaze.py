@@ -18,7 +18,7 @@ from TMaze_new.TMaze_new_src.utils import set_seed, get_intro, TMaze_data_genera
 from TMaze_new.TMaze_new_src.train import train
 
 os.environ["MKL_NUM_THREADS"] = "1" 
-os.environ["NUMEXPR_NUM_THREADS"] = "1" 
+os.environ["NUMEXPR_NUM_THREADS"] = "1"  
 os.environ["OMP_NUM_THREADS"] = "1" 
 
 with open("TMaze_new/TMaze_new_src/config.yaml") as f:
