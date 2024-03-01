@@ -1,6 +1,6 @@
 # Recurrent Action Transformer with Memory (RATE) 
 - [x] TMaze (done)
-- [ ] VizDoom (coming soon)
+- [ ] VizDoom (in progress)
 - [ ] Memory Maze (TBD)
 
 ### Installing dependencies:
