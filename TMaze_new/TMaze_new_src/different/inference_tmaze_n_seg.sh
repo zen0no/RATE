@@ -61,18 +61,5 @@ for dir in */; do
     cd "$ckpt_dir"
 done
 
-# location=$(pwd)
-# cd $OLDPWD
-
-# directory="TMaze_new/TMaze_new_inference/TMaze_new_inference_${location##*/}/$new_string_no_run"
-# # echo "${directory%/}"
-# python3 TMaze_new/TMaze_new_src/utils/parse_inference_csv.py --directory "${directory%/}" --mode "${mode%/}"
-
-# cd "$directory"
-# #find -type f -name '*_"${mode%/}"_*' -delete
-# find -type f -name "*_${mode%/}_*" ! -name '*FINAL*' -delete
-# cd $OLDPWD
-
-
 # ~/Name/REPOSITORIES/RATE$ TMaze_new/TMaze_new_src/inference_tmaze.sh
 # TMaze_new/TMaze_new_src/different/inference_tmaze_n_seg.sh -c 'DT_RATE_GRATE' -m 'RATE' -a 'TrXL' -s 'max_1' -n 20
