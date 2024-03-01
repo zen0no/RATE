@@ -53,6 +53,7 @@ class VisDoomDataset(Dataset):
         d = self.data['done'][index]
         
         s = torch.from_numpy(s).float()
+        print(s.shape)
         mean = torch.mean(s, dim=[0, 2, 3])
         std = torch.std(s, dim=[0, 2, 3])
         if self.normalize:
@@ -73,6 +74,7 @@ class VisDoomDataset(Dataset):
         rtg = rtg[:, :self.max_length, :]
         d = d[:, :self.max_length, :]
         mask = mask[:, :self.max_length, :]
+        print(s.shape)
         
         return s.squeeze(0), a.squeeze(0), rtg.squeeze(0), d.squeeze(), timesteps.squeeze(), mask.squeeze()
     
