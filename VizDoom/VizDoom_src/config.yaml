@@ -1,6 +1,6 @@
 wandb_config:
     project_name: "RATE_VizDoom"
-    wwandb: False
+    wwandb: True
 
 data_config:
   gamma: 1.0

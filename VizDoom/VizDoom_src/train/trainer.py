@@ -95,6 +95,8 @@ def train(ckpt_path, config, train_dataloader):
                     optimizer.step()
                     scheduler.step()
                     lr = optimizer.state_dict()['param_groups'][0]['lr']
+                    if wwandb:
+                        wandb.log({"learning_rate": lr})
             it_counter += 1 
             
         #if model.flag == 1:
@@ -105,8 +107,8 @@ def train(ckpt_path, config, train_dataloader):
             #scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, factor=learning_rate_decay, patience=patience, mode="min")
             scheduler = torch.optim.lr_scheduler.LinearLR(optimizer, 
                                                           start_factor=1.0, 
-                                                          end_factor=0.001,
-                                                          total_iters=5*len(train_dataloader)*config["training_config"]["epochs"])
+                                                          end_factor=0.01,
+                                                          total_iters=config["training_config"]["sections"]*len(train_dataloader)*config["training_config"]["epochs"])
             switch = True
         
         # Save

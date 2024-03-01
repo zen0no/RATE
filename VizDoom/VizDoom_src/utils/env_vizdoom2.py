@@ -11,7 +11,10 @@ from itertools import count
 import time
 import gym
 from gym import spaces
-from common_wrappers import ImgObsWrapper, FrameStack, PrevActionAndReward
+# from VizDoom.VizDoom_src.utils.common_wrappers import ImgObsWrapper, FrameStack, PrevActionAndReward
+import sys
+sys.path.append("../../")
+from VizDoom.VizDoom_src.utils.common_wrappers import FrameStack, PrevActionAndReward
 from enum import IntEnum
 
 
@@ -407,8 +410,8 @@ def make_pytorch_vizdoom(
     )
     
     env = VizdoomAsGym(env) #gym wrapper
-    if image_only:
-        env = ImgObsWrapper(env)
+    # if image_only:
+    #     env = ImgObsWrapper(env)
 
     if framestack > 1:
         env = FrameStack(env, framestack)

@@ -6,7 +6,7 @@ import numpy as np
 from collections import deque
 from gym import spaces
 #ImgObsWrapper returns 'image' value from dict observations
-from gym_minigrid.wrappers import ImgObsWrapper
+# from gym_minigrid.wrappers import ImgObsWrapper
 
 def batchify(input, add_time_dim=False, device=None, dtype=None):
 
