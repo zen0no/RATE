@@ -16,7 +16,7 @@ training_config:
   epochs: 400 #250
   use_erl_stop: True
   # inference during training
-  online_inference: False
+  online_inference: True
 
 model_config:
   mode: "doom"

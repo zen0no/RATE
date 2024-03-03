@@ -19,7 +19,7 @@ parent_dir = os.path.dirname(parent_dir)
 sys.path.append(parent_dir)
 
 from VizDoom.VizDoom_src.train import train
-from TMaze_new.TMaze_new_src.utils import set_seed, get_intro_vizdoom 
+from TMaze_new.TMaze_new_src.utils import set_seed, get_intro_vizdoom
 from VizDoom.VizDoom_src.utils import get_dataset, batch_mean_and_std
 
 os.environ["MKL_NUM_THREADS"] = "1" 
@@ -43,17 +43,12 @@ def create_args():
 
     return parser
 
-
-
-#================================================== DATA LOADING =============================================================#
-# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! change file !!!!!!!!!!!!!!!!
-
 if __name__ == '__main__':
     get_intro_vizdoom()
     
     args = create_args().parse_args()
-
-    train_pickle_file = 'VizDoom/VizDoom_data/val_VizDoom_Two_Colors_Column_disappear_delay_45_no_walls_agent_p1_01.pickle'
+    #================================================== DATA LOADING =============================================================#
+    train_pickle_file = 'VizDoom/VizDoom_data/train_VizDoom_Two_Colors_Column_disappear_delay_45_no_walls_agent_p1_01.pickle'
     DATA2_train = []
     with open(train_pickle_file, 'rb') as f:
         while True:
@@ -129,7 +124,7 @@ if __name__ == '__main__':
         print(f"Selected Model: {config['model_mode']}")  
 
 
-        TEXT_DESCRIPTION = "good_z_norm"
+        TEXT_DESCRIPTION = "smallerLR"
         mini_text = f"arch_mode_{config['arctitecture_mode']}"
         now = datetime.datetime.now()
         date_time = now.strftime("%Y-%m-%d_%H-%M-%S").replace('-', '_')
