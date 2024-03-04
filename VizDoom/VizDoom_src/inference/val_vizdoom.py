@@ -209,7 +209,7 @@ def get_returns_VizDoom(model, ret, seed, episode_timeout, context_length, devic
         if add_noise:
             added_noise = torch.randn_like(mem_tokens)
         else:
-            added_noise = torch.zeros_like(mem_tokens)
+            added_noise = torch.zeros_like(mem_tokens) if mem_tokens is not None else 0
         
         # !!!!!!!!!!!!!!!!!!!!!!!!!
         b, l, c, h, w = states.shape
