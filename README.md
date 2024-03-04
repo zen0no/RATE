@@ -51,7 +51,46 @@ python3 TMaze_new/TMaze_new_src/train_tmaze.py --model_mode 'RATE' \
 TMaze_new/TMaze_new_src/inference_tmaze.sh -c 'RATE_max_3' -m 'RATE' -a 'TrXL' -s 'max_3'
 ```
 
+## VizDoom
+### Downloading data
+```bash
+VizDoom/VizDoom_src/get_vizdoom_data.sh
+```
 
+### To reproduce experiments:
+#### Train:
+```bash
+VizDoom/VizDoom_src/run/train_vizdoom_DT.sh
+VizDoom/VizDoom_src/run/train_vizdoom_RATE.sh
+VizDoom/VizDoom_src/run/train_vizdoom_GRATE.sh
+```
+#### Inference:
+```bash
+VizDoom/VizDoom_src/run/val_vizdoom_DT.sh
+VizDoom/VizDoom_src/run/val_vizdoom_RATE.sh
+VizDoom/VizDoom_src/run/val_vizdoom_GRATE.sh
+```
+
+### To make individual run:
+#### Train
+```python
+python3 VizDoom/VizDoom_src/train_vizdoom.py --model_mode 'RATE' \
+                                             --arch_mode 'TrXL' \
+                                             --ckpt_folder 'RATE'
+```
+#### Inference
+#### Inference on multiple checkpoints (if multiple runs in a directory)
+```bash
+VizDoom/VizDoom_src/inference_vizdoom.sh -c 'RATE_my_folder' -m 'RATE' -a 'TrXL'
+```
+#### Inference on a single checkpoint
+```python
+python3 VizDoom/VizDoom_src/inference/inference_vizdoom.py --model_mode 'RATE' \
+                                                           --ckpt_name 'single_run_arch_mode_TrXL_RATE_RUN_1_2024_03_03_23_31_22' \
+                                                           --ckpt_folder 'RATE_my_folder' \
+                                                           --arch_mode 'TrXL' \
+                                                           --ckpt_chooser 0
+```
 
 
 

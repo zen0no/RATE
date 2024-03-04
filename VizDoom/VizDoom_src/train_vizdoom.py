@@ -33,7 +33,7 @@ with open("VizDoom/VizDoom_src/config.yaml") as f:
 # python3 VizDoom/VizDoom_src/train_vizdoom.py --model_mode 'RATE' --arch_mode 'TrXL' --ckpt_folder 'trash'
 
 def create_args():
-    parser = argparse.ArgumentParser(description='Description of your program')
+    parser = argparse.ArgumentParser(description='RATE VizDoom trainer')
 
     parser.add_argument('--model_mode',     type=str, default='RATE',  help='Model training mode. Available variants: "DT, DTXL, RATE (Ours), RATEM (RMT)"')    
     parser.add_argument('--arch_mode',      type=str, default='TrXL',  help='Model architecture mode. Available variants: "TrXL", "TrXL-I", "GTrXL"')
@@ -48,7 +48,9 @@ if __name__ == '__main__':
     
     args = create_args().parse_args()
     #================================================== DATA LOADING =============================================================#
+
     train_pickle_file = 'VizDoom/VizDoom_data/train_VizDoom_Two_Colors_Column_disappear_delay_45_no_walls_agent_p1_01.pickle'
+
     DATA2_train = []
     with open(train_pickle_file, 'rb') as f:
         while True:
@@ -124,7 +126,7 @@ if __name__ == '__main__':
         print(f"Selected Model: {config['model_mode']}")  
 
 
-        TEXT_DESCRIPTION = "smallerLR"
+        TEXT_DESCRIPTION = ""
         mini_text = f"arch_mode_{config['arctitecture_mode']}"
         now = datetime.datetime.now()
         date_time = now.strftime("%Y-%m-%d_%H-%M-%S").replace('-', '_')

@@ -5,6 +5,7 @@
 *.pickle
 *.gif
 *.pyc
+*.zip
  *.txt
 !requirements.txt
 *.ipynb_checkpoints
@@ -13,3 +14,6 @@
 *.csv
 wandb/
 __pycache__/
+*.ini
+
+9x9/

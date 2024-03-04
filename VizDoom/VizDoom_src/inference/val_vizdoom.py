@@ -243,8 +243,10 @@ def get_returns_VizDoom(model, ret, seed, episode_timeout, context_length, devic
         #print(sampled_action[-1])
         
         # print(np.round(torch.softmax(sampled_action, dim=-1).squeeze().detach().cpu().numpy(), 3))
-        if use_argmax == False:
+        if not use_argmax:
             act = np.random.choice([0, 1, 2, 3, 4], p=torch.softmax(sampled_action, dim=-1).squeeze().detach().cpu().numpy())
+        else:
+            act = np.argmax(torch.softmax(sampled_action, dim=-1).squeeze().detach().cpu().numpy())
         
         actions[-1] = act
         act_list.append(act)

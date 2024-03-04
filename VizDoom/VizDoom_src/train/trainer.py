@@ -11,8 +11,8 @@ def train(ckpt_path, config, train_dataloader, mean, std):
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-    episode_timeout = 2100
-    use_argmax = False
+    episode_timeout = config["online_inference_config"]["episode_timeout"]
+    use_argmax = config["online_inference_config"]["use_argmax"]
     MEAN = torch.tensor([13.6313, 19.6772, 14.7505]).to(device)
     STD  = torch.tensor([16.7388, 20.3475, 10.3455]).to(device)
 
@@ -131,8 +131,7 @@ def train(ckpt_path, config, train_dataloader, mean, std):
         if (epoch + 1) % 100 == 0 or epoch == config["training_config"]["epochs"] - 1:
             if config["training_config"]["online_inference"] == True:
                 model.eval()
-                for ret in [56.5]:
-                    goods, bads = 0, 0
+                for ret in [config["online_inference_config"]["desired_return"]]:
                     acts = []
                     returns = []
                     ts = []
@@ -159,6 +158,7 @@ def train(ckpt_path, config, train_dataloader, mean, std):
             wandb_step += 1 
             if wwandb:
                 wandb.log({"checkpoint_step": wandb_step})
-            torch.save(model.state_dict(), ckpt_path + '_save' + '_KTD.pth')
+            # torch.save(model.state_dict(), ckpt_path + '_save' + '_KTD.pth')
+            torch.save(model.state_dict(), ckpt_path + str(wandb_step) + '_KTD.pth')
             
     return model

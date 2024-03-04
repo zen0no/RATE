@@ -13,7 +13,7 @@ training_config:
   warmup_steps: 50  # 50
   grad_norm_clip: 1.0 # 1.0
   context_length: 30
-  epochs: 400 #250
+  epochs: 500 #250
   use_erl_stop: True
   # inference during training
   online_inference: True
@@ -33,12 +33,13 @@ model_config:
   mem_len: 2
   ext_len: 1
   tie_weight: False
-  num_mem_tokens: 5 # 5 d_head * nmt = diff params
+  num_mem_tokens: 15 # 5 d_head * nmt = diff params
   mem_at_end: True
 
 online_inference_config:
-  episode_timeout:
-  corridor_length:
+  use_argmax: False
+  episode_timeout: 2100
+  desired_return: 56.5
 
 
 
