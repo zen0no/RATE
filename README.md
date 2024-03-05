@@ -7,4 +7,4 @@ Out code based on [this RMT repository](https://github.com/booydar/LM-RMT). The 
 
 This repository remains a work in progress, as our paper is currently undergoing the review process. We intend to provide additional details regarding citation and accompanying figures illustrating the model architecture soon.
 
-To reproduce the experiments on the TMaze and VizDoom-Two-Colors environments, navigate to the `/Vizdoom` branch
+To reproduce the experiments on the TMaze and VizDoom-Two-Colors environments, navigate to the `/VizDoom` branch
