@@ -13,3 +13,7 @@
 *.csv
 wandb/
 __pycache__/
+9x9/
+MemoryMaze_data/
+*.zip
+*.npz
