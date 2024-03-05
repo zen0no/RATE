@@ -51,6 +51,7 @@ def train(ckpt_path, config, train_dataloader, mean, std):
         model.train()
         for it, batch in enumerate(train_dataloader):
             s, a, rtg, d, timesteps, masks = batch
+            #print(s.shape, a.shape, rtg.shape, timesteps.shape, masks.shape)
             # ! NORMALIZATION
             if config["data_config"]["normalize"]:
                 _b, _l, _c, _h, _w = s.shape

@@ -30,13 +30,13 @@ if __name__ == '__main__':
     
     threads = {}
     for i in range(10):
-        data_path = f'MemoryMaze/MemoryMaze_src/9x9/train_mem_maze_9x9_part{i}.zip'
+        data_path = f'MemoryMaze/MemoryMaze_data/9x9/train_mem_maze_9x9_part{i}.zip'
         file_exist = os.path.exists(data_path)
         if not file_exist:
             print(f"File train_mem_maze_9x9_part{i}.zip does not exist. Downloading...")
             threads[i] = threading.Thread(target=download_file, 
                                           args=(f"https://drive.google.com/uc?id={train_parts[i]}", 
-                                                f'MemoryMaze/MemoryMaze_src/9x9/train_mem_maze_9x9_part{i}.zip'))
+                                                f'MemoryMaze/MemoryMaze_data/9x9/train_mem_maze_9x9_part{i}.zip'))
         else:
             print(f"File train_mem_maze_9x9_part{i}.zip exists. It's good!")
             

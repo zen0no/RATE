@@ -80,9 +80,9 @@ if __name__ == '__main__':
                                 max_length=config["training_config"]["sections"]*config["training_config"]["context_length"], 
                                 normalize=config["data_config"]["normalize"])
     train_dataloader = DataLoader(train_dataset, 
-                                    batch_size=config["training_config"]["batch_size"], 
-                                    shuffle=True, 
-                                    num_workers=4)
+                                  batch_size=config["training_config"]["batch_size"], 
+                                  shuffle=True, 
+                                  num_workers=4)
 
     print(f"Train: {len(train_dataset)}")
 

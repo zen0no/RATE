@@ -101,7 +101,7 @@ class MemTransformerLM(nn.Module):
                                               )
             
         if self.mode == 'doom':
-            self.head = nn.Linear(d_embed, 5, bias=False) # !!!!!!!!!!! , bias=False)
+            self.head = nn.Linear(d_embed, 5, bias=False)
             self.state_encoder = nn.Sequential(nn.Conv2d(3, 32, 8, stride=4, padding=0),
                                                nn.ReLU(),
                                                nn.Conv2d(32, 64, 4, stride=2, padding=0),
@@ -109,16 +109,6 @@ class MemTransformerLM(nn.Module):
                                                nn.Conv2d(64, 64, 3, stride=1, padding=0),
                                                nn.ReLU(),
                                                nn.Flatten(), nn.Linear(2560, d_embed),
-                                               nn.Tanh())   
-        if self.mode == 'memory_maze':
-            self.head = nn.Linear(d_embed, 5)
-            self.state_encoder = nn.Sequential(nn.Conv2d(3, 32, 8, stride=4, padding=0),
-                                               nn.ReLU(),
-                                               nn.Conv2d(32, 64, 4, stride=2, padding=0),
-                                               nn.ReLU(),
-                                               nn.Conv2d(64, 64, 3, stride=1, padding=0),
-                                               nn.ReLU(),
-                                               nn.Flatten(), nn.Linear(1024, d_embed),
                                                nn.Tanh())           
             
             
