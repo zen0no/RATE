@@ -1,6 +1,7 @@
 import numpy as np
 import torch
 from TMaze_new.TMaze_new_src.utils.tmaze import TMazeClassicPassive
+#from TMaze_new.TMaze_new_src.utils import set_seed
 
 @torch.no_grad()
 def sample(model, x, block_size, steps, sample=False, top_k=None, actions=None, rtgs=None, timestep=None, mem_tokens=1, saved_context=None):
@@ -26,6 +27,7 @@ def sample(model, x, block_size, steps, sample=False, top_k=None, actions=None, 
     return logits, mem_tokens, memory, attn_map
 
 def get_returns_TMaze(model, ret, seed, episode_timeout, corridor_length, context_length, device, act_dim, config, create_video=False):
+    
     #set_seed(seed)
     
     scale = 1

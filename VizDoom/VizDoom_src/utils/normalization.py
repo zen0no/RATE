@@ -1,11 +1,13 @@
 import torch
+from tqdm import tqdm
 
 def batch_mean_and_std(loader):
     cnt = 0
     fst_moment = torch.empty(3)
     snd_moment = torch.empty(3)
 
-    for images, _, _, _, _, _ in loader:
+    print("Calculating dataset statistics...")
+    for images, _, _, _, _, _ in tqdm(loader, total=len(loader)):
         b, l, c, h, w = images.shape
         images = images.reshape(-1, c, h, w)
         nb_pixels = b * l * h * w
@@ -15,7 +17,7 @@ def batch_mean_and_std(loader):
         snd_moment = (cnt * snd_moment + sum_of_square) / (cnt + nb_pixels)
         cnt += nb_pixels
 
-    mean, std = fst_moment, torch.sqrt(snd_moment - fst_moment ** 2)        
+    mean, std = fst_moment, torch.sqrt(snd_moment - fst_moment ** 2)
 
     return mean, std
 

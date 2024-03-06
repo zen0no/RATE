@@ -19,50 +19,35 @@ parent_dir = os.path.dirname(parent_dir)
 sys.path.append(parent_dir)
 
 from VizDoom.VizDoom_src.train import train
-from TMaze_new.TMaze_new_src.utils import set_seed, get_intro_vizdoom
+from TMaze_new.TMaze_new_src.utils import set_seed, get_intro_mem_maze
 from VizDoom.VizDoom_src.utils import get_dataset, batch_mean_and_std
+from MemoryMaze.MemoryMaze_src.utils import MemoryMazeDataset
 
 os.environ["MKL_NUM_THREADS"] = "1" 
 os.environ["NUMEXPR_NUM_THREADS"] = "1"  
 os.environ["OMP_NUM_THREADS"] = "1" 
 
+# python3 MemoryMaze/MemoryMaze_src/train_mem_maze.py --model_mode 'RATE' --arch_mode 'TrXL' --ckpt_folder 'trash'
 
-with open("VizDoom/VizDoom_src/config.yaml") as f:
+with open("MemoryMaze/MemoryMaze_src/config.yaml") as f:
     config = yaml.load(f, Loader=yaml.FullLoader)
 
-# python3 VizDoom/VizDoom_src/train_vizdoom.py --model_mode 'RATE' --arch_mode 'TrXL' --ckpt_folder 'trash'
-
 def create_args():
-    parser = argparse.ArgumentParser(description='RATE VizDoom trainer')
+    parser = argparse.ArgumentParser(description='RATE MemoryMaze trainer')
 
     parser.add_argument('--model_mode',     type=str, default='RATE',  help='Model training mode. Available variants: "DT, DTXL, RATE (Ours), RATEM (RMT)"')    
     parser.add_argument('--arch_mode',      type=str, default='TrXL',  help='Model architecture mode. Available variants: "TrXL", "TrXL-I", "GTrXL"')
     parser.add_argument('--start_seed',     type=int, default=1,       help='Start seed')
-    parser.add_argument('--end_seed',       type=int, default=5,       help='End seed')
+    parser.add_argument('--end_seed',       type=int, default=6,       help='End seed')
     parser.add_argument('--ckpt_folder',    type=str, default='ckpt',  help='Checkpoints directory')
 
     return parser
 
 if __name__ == '__main__':
-    get_intro_vizdoom()
+
+    get_intro_mem_maze()
     
     args = create_args().parse_args()
-    #================================================== DATA LOADING =============================================================#
-
-    train_pickle_file = 'VizDoom/VizDoom_data/train_VizDoom_Two_Colors_Column_disappear_delay_45_no_walls_agent_p1_01.pickle'
-
-    DATA2_train = []
-    with open(train_pickle_file, 'rb') as f:
-        while True:
-            try:
-                data = pickle.load(f)
-                DATA2_train.append(data)
-            except EOFError:
-                break
-    DATA_train = {}
-    for key in tqdm(DATA2_train[0].keys()):
-        DATA_train[key] = [d[key] for d in DATA2_train]
-    ############################################################################
 
     model_mode = args.model_mode
     start_seed = args.start_seed
@@ -76,7 +61,6 @@ if __name__ == '__main__':
     # RUN = 1
     for RUN in range(start_seed, end_seed+1):
         set_seed(RUN)
-        print(f"Random seed set as {RUN}")
 
         """ ARCHITECTURE MODE """
         if config["arctitecture_mode"] == "TrXL":
@@ -122,10 +106,10 @@ if __name__ == '__main__':
             max_length = config["training_config"]["sections"]*config["training_config"]["context_length"]
             max_segments = config["training_config"]["sections"]
 
-        print(f"Selected Model: {config['model_mode']}")  
+        print(f"Selected Model: {config['model_mode']}") 
 
 
-        TEXT_DESCRIPTION = "good"
+        TEXT_DESCRIPTION = ""
         mini_text = f"arch_mode_{config['arctitecture_mode']}"
         now = datetime.datetime.now()
         date_time = now.strftime("%Y-%m-%d_%H-%M-%S").replace('-', '_')
@@ -133,26 +117,27 @@ if __name__ == '__main__':
         name = f'{TEXT_DESCRIPTION}_{mini_text}_{config["model_mode"]}_RUN_{RUN}_{date_time}'
         current_dir = os.getcwd()
         current_folder = os.path.basename(current_dir)
-        ckpt_path = f'../{current_folder}/VizDoom/VizDoom_checkpoints/{ckpt_folder}/{name}/'
+        ckpt_path = f'../{current_folder}/MemoryMaze/MemoryMaze_checkpoints/{ckpt_folder}/{name}/'
         isExist = os.path.exists(ckpt_path)
         if not isExist:
             os.makedirs(ckpt_path)
 
         if config["wandb_config"]["wwandb"]:
-            #run = wandb.init(entity="rmdt", project="VizDoom_clear", name=name, group=group, config=config, save_code=True, reinit=True)
             run = wandb.init(project=config['wandb_config']['project_name'], name=name, group=group, config=config, save_code=True, reinit=True)
 
         #================================================== DATALOADERS CREATION ======================================================#
-        train_dataset = get_dataset(DATA_train, 
-                                    gamma=config["data_config"]["gamma"], 
-                                    max_length=max_length, 
-                                    normalize=config["data_config"]["normalize"])
+        path_to_splitted_dataset = 'MemoryMaze/MemoryMaze_data/9x9/'
+
+        train_dataset = MemoryMazeDataset(path_to_splitted_dataset, 
+                                         gamma=config["data_config"]["gamma"], 
+                                         max_length=max_length, 
+                                         only_non_zero_rewards=config["data_config"]["only_non_zero_rewards"])
+        
         train_dataloader = DataLoader(train_dataset, 
                                      batch_size=config["training_config"]["batch_size"], 
                                      shuffle=True, 
                                      num_workers=4)
 
-        #print(f"Train: {len(train_dataset)}")
         print(f"Train: {len(train_dataloader) * config['training_config']['batch_size']} trajectories (first {max_length} steps)")
 
         mean, std = batch_mean_and_std(train_dataloader)

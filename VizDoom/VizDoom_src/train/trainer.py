@@ -5,16 +5,19 @@ from tqdm import tqdm
 from RATE_GTrXL import mem_transformer_v2_GTrXL
 from VizDoom.VizDoom_src.utils import z_normalize, inverse_z_normalize
 from VizDoom.VizDoom_src.inference.val_vizdoom import get_returns_VizDoom
+from MemoryMaze.MemoryMaze_src.inference.val_mem_maze import get_returns_MemoryMaze
 from TMaze_new.TMaze_new_src.utils import seeds_list
 
-def train(ckpt_path, config, train_dataloader, mean, std):
+def train(ckpt_path, config, train_dataloader, mean, std, max_segments):
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
     episode_timeout = config["online_inference_config"]["episode_timeout"]
     use_argmax = config["online_inference_config"]["use_argmax"]
-    MEAN = torch.tensor([13.6313, 19.6772, 14.7505]).to(device)
-    STD  = torch.tensor([16.7388, 20.3475, 10.3455]).to(device)
+    # MEAN = torch.tensor([13.6313, 19.6772, 14.7505])
+    # STD  = torch.tensor([16.7388, 20.3475, 10.3455])
+    MEAN = mean
+    STD = std
 
     model = mem_transformer_v2_GTrXL.MemTransformerLM(**config["model_config"])
 
@@ -40,9 +43,9 @@ def train(ckpt_path, config, train_dataloader, mean, std):
     print(f"model parameters: {sum(p.numel() for p in list(model.parameters()))}")
     it_counter = 0
     switch = False
-    block_size = 3*config["training_config"]["context_length"]
+
     EFFECTIVE_SIZE_BLOCKS = config["training_config"]["context_length"] * config["training_config"]["sections"]
-    BLOCKS_CONTEXT = block_size//3
+    BLOCKS_CONTEXT = config["training_config"]["context_length"]
     
     pbar = tqdm(range(config["training_config"]["epochs"]))
     for epoch in pbar:
@@ -56,36 +59,28 @@ def train(ckpt_path, config, train_dataloader, mean, std):
             if config["data_config"]["normalize"]:
                 _b, _l, _c, _h, _w = s.shape
                 s = s.reshape(_b*_l, _c, _h, _w)
-                s = z_normalize(s, mean, std)
+                s = z_normalize(s, MEAN, STD)
                 s = s.reshape(_b, _l, _c, _h, _w)
             # ! NORMALIZATION
-            #print('1', s.shape)
+            # print('1', s.shape)
             memory = None
             mem_tokens=None
             
-            if config["model_mode"] == 'DT':
-                block_part_range = range(1)
-            else:
-                block_part_range = range(EFFECTIVE_SIZE_BLOCKS//BLOCKS_CONTEXT)
+            block_part_range = range(EFFECTIVE_SIZE_BLOCKS//BLOCKS_CONTEXT)
+            # print("RANGE", block_part_range)
                 
             for block_part in block_part_range:
-                if config["model_mode"] == 'DT':
-                    x1 = s.to(device)
-                    y1 = a.to(device).float()
-                    r1 = rtg.to(device).float()
-                    t1 = timesteps.to(device)
-                    masks1 = masks.to(device)
-                else:
-                    from_idx = block_part*(BLOCKS_CONTEXT)
-                    to_idx = (block_part+1)*(BLOCKS_CONTEXT)
-                    x1 = s[:, from_idx:to_idx, :].to(device) # torch.Size([128, 30, 3, 64, 112])
-                    y1 = a[:, from_idx:to_idx, :].to(device).float()
-                    r1 = rtg[:,:,:][:, from_idx:to_idx, :].to(device).float() 
-                    t1 = timesteps[:, from_idx:to_idx].to(device)
-                    masks1 = masks[:, from_idx:to_idx].to(device)
+                from_idx = block_part*(BLOCKS_CONTEXT)
+                to_idx = (block_part+1)*(BLOCKS_CONTEXT)
+                
+                x1 = s[:, from_idx:to_idx, :].to(device) # torch.Size([128, 30, 3, 64, 112])
+                y1 = a[:, from_idx:to_idx, :].to(device).float()
+                r1 = rtg[:,:,:][:, from_idx:to_idx, :].to(device).float() 
+                t1 = timesteps[:, from_idx:to_idx].to(device)
+                masks1 = masks[:, from_idx:to_idx].to(device)
                     
-                #print('2', x1.shape)
-                model.flag = 1 if block_part == list(range(EFFECTIVE_SIZE_BLOCKS//BLOCKS_CONTEXT))[-1] else 0
+                # print('2', x1.shape)
+                model.flag = 1 if block_part == max(block_part_range) else 0
                 if mem_tokens is not None:
                     mem_tokens = mem_tokens.detach()
                 elif raw_model.mem_tokens is not None:
@@ -125,34 +120,58 @@ def train(ckpt_path, config, train_dataloader, mean, std):
             scheduler = torch.optim.lr_scheduler.LinearLR(optimizer, 
                                                           start_factor=1.0, 
                                                           end_factor=0.01,
-                                                          total_iters=config["training_config"]["sections"]*len(train_dataloader)*config["training_config"]["epochs"])
+                                                          total_iters=max_segments*len(train_dataloader)*config["training_config"]["epochs"])
             switch = True
         
         # Save
-        if (epoch + 1) % 100 == 0 or epoch == config["training_config"]["epochs"] - 1:
+        if (epoch + 1) % 100 == 0 or epoch == config["training_config"]["epochs"] - 1 or (epoch + 1) == 50 or (epoch + 1) == 25 or (epoch + 1) == 1:
             if config["training_config"]["online_inference"] == True:
-                model.eval()
-                for ret in [config["online_inference_config"]["desired_return"]]:
-                    acts = []
-                    returns = []
-                    ts = []
-                    for i in range(len(seeds_list)):
-                        episode_return, act_list, t, _, _ = get_returns_VizDoom(model=model, ret=ret, seed=seeds_list[i], 
-                                                                                episode_timeout=episode_timeout, 
-                                                                                context_length=config["training_config"]["context_length"], 
-                                                                                device=device, act_dim=config["model_config"]["ACTION_DIM"], 
-                                                                                config=config,
-                                                                                mean=MEAN,
-                                                                                std=STD,
-                                                                                use_argmax=use_argmax, create_video=False)
-                        acts += act_list
-                        returns.append(episode_return)
-                        ts.append(t)
-                        pbar.set_description(f"Online inference: [{i+1} / {len(seeds_list)}] Time: {t}, Return: {episode_return:.2f}")
+                if config["model_config"]["mode"] == 'doom':
+                    model.eval()
+                    for ret in [config["online_inference_config"]["desired_return"]]:
+                        acts = []
+                        returns = []
+                        ts = []
+                        for i in range(len(seeds_list)):
+                            episode_return, act_list, t, _, _ = get_returns_VizDoom(model=model, ret=ret, seed=seeds_list[i], 
+                                                                                    episode_timeout=episode_timeout, 
+                                                                                    context_length=config["training_config"]["context_length"], 
+                                                                                    device=device, act_dim=config["model_config"]["ACTION_DIM"], 
+                                                                                    config=config,
+                                                                                    mean=MEAN,
+                                                                                    std=STD,
+                                                                                    use_argmax=use_argmax, create_video=False)
+                            acts += act_list
+                            returns.append(episode_return)
+                            ts.append(t)
+                            pbar.set_description(f"Online inference: [{i+1} / {len(seeds_list)}] Time: {t}, Return: {episode_return:.2f}")
 
-                    if wwandb:
-                        wandb.log({"LifeTime":  t,
-                                   "return": episode_return})
+                        if wwandb:
+                            wandb.log({"LifeTime":  t,
+                                    "return": episode_return})
+                elif config["model_config"]["mode"] == 'memory_maze':
+                    model.eval()
+                    for ret in [config["online_inference_config"]["desired_return"]]:
+                        acts = []
+                        returns = []
+                        ts = []
+                        for i in range(len(seeds_list)):
+                            episode_return, act_list, t, _, _ = get_returns_MemoryMaze(model=model, ret=ret, seed=seeds_list[i], 
+                                                                                    episode_timeout=episode_timeout, 
+                                                                                    context_length=config["training_config"]["context_length"], 
+                                                                                    device=device, act_dim=config["model_config"]["ACTION_DIM"], 
+                                                                                    config=config,
+                                                                                    mean=MEAN,
+                                                                                    std=STD,
+                                                                                    use_argmax=use_argmax, create_video=False)
+                            acts += act_list
+                            returns.append(episode_return)
+                            ts.append(t)
+                            pbar.set_description(f"Online inference: [{i+1} / {len(seeds_list)}] Time: {t}, Return: {episode_return:.2f}")
+
+                        if wwandb:
+                            wandb.log({"LifeTime":  t,
+                                    "return": episode_return})
 
             
             model.train()
@@ -160,6 +179,6 @@ def train(ckpt_path, config, train_dataloader, mean, std):
             if wwandb:
                 wandb.log({"checkpoint_step": wandb_step})
             # torch.save(model.state_dict(), ckpt_path + '_save' + '_KTD.pth')
-            torch.save(model.state_dict(), ckpt_path + str(wandb_step) + '_KTD.pth')
+            torch.save(model.state_dict(), ckpt_path + str(epoch+1) + '_KTD.pth')
             
     return model

@@ -1,15 +1,16 @@
 wandb_config:
-    project_name: "RATE_VizDoom"
+    project_name: "RATE_MemoryMaze"
     wwandb: True
 
 data_config:
   gamma: 1.0
   normalize: True
+  only_non_zero_rewards: True
 
 training_config:
   learning_rate: 0.001 # 1e-3
   weight_decay: 0.0001
-  batch_size: 128 # 128
+  batch_size: 128 # 128 
   warmup_steps: 80  # 50
   grad_norm_clip: 1.0 # 1.0
   epochs: 500 #250
@@ -24,9 +25,9 @@ training_config:
 
 
 model_config:
-  mode: "doom"
+  mode: "memory_maze"
   STATE_DIM: 3
-  ACTION_DIM: 1
+  ACTION_DIM: 6
   n_token: 10000 # vocab_size
   n_layer: 3 # 3
   n_head: 1 # 1
@@ -43,8 +44,8 @@ model_config:
 
 online_inference_config:
   use_argmax: False
-  episode_timeout: 2100
-  desired_return: 56.5
+  episode_timeout: 1001
+  desired_return: 3
 
 
 

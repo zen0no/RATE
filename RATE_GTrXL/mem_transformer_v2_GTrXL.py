@@ -11,8 +11,6 @@ import torch.nn.functional as F
 from RATE_GTrXL.utils import LogUniformSampler, sample_logits, ProjectedAdaptiveLogSoftmax
 from RATE_GTrXL.blocks import RelPartialLearnableDecoderLayer, PositionalEmbedding
 
-# https://github.com/jerrodparker20/adaptive-transformers-in-rl/blob/6f75366b78998fb1d8755acd2d851c461c82ee75/StableTransformersReplication/transformer_xl.py
-
 class MemTransformerLM(nn.Module):
     def __init__(self, STATE_DIM, 
                  ACTION_DIM, 
@@ -101,7 +99,7 @@ class MemTransformerLM(nn.Module):
                                               )
             
         if self.mode == 'doom':
-            self.head = nn.Linear(d_embed, 5, bias=False) # !!!!!!!!!!! , bias=False)
+            self.head = nn.Sequential(*([nn.Linear(d_embed, 5)] + ([nn.Tanh()])))
             self.state_encoder = nn.Sequential(nn.Conv2d(3, 32, 8, stride=4, padding=0),
                                                nn.ReLU(),
                                                nn.Conv2d(32, 64, 4, stride=2, padding=0),
@@ -111,7 +109,7 @@ class MemTransformerLM(nn.Module):
                                                nn.Flatten(), nn.Linear(2560, d_embed),
                                                nn.Tanh())   
         if self.mode == 'memory_maze':
-            self.head = nn.Linear(d_embed, 5)
+            self.head = nn.Sequential(*([nn.Linear(d_embed, self.ACTION_DIM)] + ([nn.Tanh()])))
             self.state_encoder = nn.Sequential(nn.Conv2d(3, 32, 8, stride=4, padding=0),
                                                nn.ReLU(),
                                                nn.Conv2d(32, 64, 4, stride=2, padding=0),
@@ -520,20 +518,20 @@ class MemTransformerLM(nn.Module):
 
             if self.mode == 'doom':
                 B, B1, C, H, W = states.shape
-                states = states.view(-1, C, H, W)
+                states = states.reshape(-1, C, H, W).type(torch.float32).contiguous() 
             elif self.mode == 'atari':
                 B, B1, C, H, W = states.shape
                 states = states.reshape(-1, 4, 84, 84).type(torch.float32).contiguous() 
+            elif self.mode == 'memory_maze':
+                B, B1, C, H, W = states.shape
+                states = states.reshape(-1, C, H, W).type(torch.float32).contiguous() 
             else:
                 B, B1, C = states.shape
 
             state_embeddings = self.state_encoder(states) # (batch * block_size, n_embd)
 
-            if self.mode == 'doom':
-                state_embeddings = state_embeddings.view(B, B1, self.d_embed)
-
-            if self.mode == 'atari':
-                state_embeddings = state_embeddings.reshape(B, B1, self.d_embed)
+            state_embeddings = state_embeddings.reshape(B, B1, self.d_embed)
+            
 
             rtg_embeddings = self.ret_emb(rtgs)
             time_embeddings = self.embed_timestep(timesteps)
@@ -686,6 +684,13 @@ class MemTransformerLM(nn.Module):
                 
             if self.mode == 'doom':
                 #print(logits.shape, target.shape)
+                loss = F.cross_entropy(logits.reshape(-1, logits.size(-1)),
+                                       target.reshape(-1).long())
+
+            if self.mode == 'memory_maze':
+                #print(logits.shape, target.shape)
+                # print(logits[0][0])
+                target = torch.argmax(target, dim=-1).unsqueeze(-1)
                 loss = F.cross_entropy(logits.reshape(-1, logits.size(-1)),
                                        target.reshape(-1).long())
                 
