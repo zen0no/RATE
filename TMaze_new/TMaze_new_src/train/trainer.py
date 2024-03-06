@@ -230,7 +230,7 @@ def train(model, optimizer, scheduler, raw_model, new_segment, epochs_counter, s
                         episode_return, act_list, t, _ , delta_t, attn_map = get_returns_TMaze(model=model, ret=1.0, seed=seeds[iii], episode_timeout=config["episode_timeout"],
                                                                                                 corridor_length=config["corridor_length"], context_length=config["context_length"],
                                                                                                 device=device, act_dim=config["act_dim"], config=config, create_video=False)
-                        if episode_return == 1.0:
+                        if episode_return == config["data_config"]["desired_reward"]:
                             goods += 1
                         else:
                             bads += 1

@@ -1,3 +1,4 @@
+import numpy as np
 import torch
 import wandb
 from tqdm import tqdm
@@ -129,7 +130,6 @@ def train(ckpt_path, config, train_dataloader, mean, std, max_segments):
                 if config["model_config"]["mode"] == 'doom':
                     model.eval()
                     for ret in [config["online_inference_config"]["desired_return"]]:
-                        acts = []
                         returns = []
                         ts = []
                         for i in range(len(seeds_list)):
@@ -141,18 +141,16 @@ def train(ckpt_path, config, train_dataloader, mean, std, max_segments):
                                                                                     mean=MEAN,
                                                                                     std=STD,
                                                                                     use_argmax=use_argmax, create_video=False)
-                            acts += act_list
+
                             returns.append(episode_return)
                             ts.append(t)
                             pbar.set_description(f"Online inference: [{i+1} / {len(seeds_list)}] Time: {t}, Return: {episode_return:.2f}")
 
                         if wwandb:
-                            wandb.log({"LifeTime":  t,
-                                    "return": episode_return})
+                            wandb.log({"LifeTime":  np.mean(ts), "return": np.mean(returns)})
                 elif config["model_config"]["mode"] == 'memory_maze':
                     model.eval()
                     for ret in [config["online_inference_config"]["desired_return"]]:
-                        acts = []
                         returns = []
                         ts = []
                         for i in range(len(seeds_list)):
@@ -164,14 +162,13 @@ def train(ckpt_path, config, train_dataloader, mean, std, max_segments):
                                                                                     mean=MEAN,
                                                                                     std=STD,
                                                                                     use_argmax=use_argmax, create_video=False)
-                            acts += act_list
+
                             returns.append(episode_return)
                             ts.append(t)
                             pbar.set_description(f"Online inference: [{i+1} / {len(seeds_list)}] Time: {t}, Return: {episode_return:.2f}")
 
                         if wwandb:
-                            wandb.log({"LifeTime":  t,
-                                    "return": episode_return})
+                            wandb.log({"LifeTime":  np.mean(ts), "return": np.mean(returns)})
 
             
             model.train()

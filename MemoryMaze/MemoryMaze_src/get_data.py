@@ -35,7 +35,8 @@ if __name__ == '__main__':
         if not file_exist:
             print(f"File train_mem_maze_9x9_part{i}.zip does not exist. Downloading...")
             threads[i] = threading.Thread(target=download_file, 
-                                          args=(f"https://drive.google.com/uc?id={train_parts[i]}", 
+                                          args=(f"https://drive.google.com/uc?id={train_parts[i]}&confirm=t", 
+                                                #f"https://drive.google.com/uc?export=download&confirm=pbef&id={train_parts[i]}",
                                                 f'MemoryMaze/MemoryMaze_data/9x9/train_mem_maze_9x9_part{i}.zip'))
         else:
             print(f"File train_mem_maze_9x9_part{i}.zip exists. It's good!")

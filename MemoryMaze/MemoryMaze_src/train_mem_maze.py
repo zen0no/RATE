@@ -61,6 +61,7 @@ if __name__ == '__main__':
     # RUN = 1
     for RUN in range(start_seed, end_seed+1):
         set_seed(RUN)
+        print(f"Random seed set as {RUN}")
 
         """ ARCHITECTURE MODE """
         if config["arctitecture_mode"] == "TrXL":

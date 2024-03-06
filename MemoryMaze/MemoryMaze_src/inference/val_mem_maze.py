@@ -2,6 +2,8 @@ import torch
 import numpy as np
 import gym
 gym.logger.set_level(40)
+import logging
+logging.disable(logging.WARNING)
 
 from TMaze_new.TMaze_new_src.utils import set_seed
 from VizDoom.VizDoom_src.utils import z_normalize, inverse_z_normalize
