@@ -151,7 +151,7 @@ class MemTransformerLM(nn.Module):
         self.max_klen = None#tgt_len + ext_len + mem_len + num_mem_tokens
         self.num_mem_tokens = num_mem_tokens
         self.init_mem_tokens()
-        self.read_mem_from_cache = read_mem_from_cache
+        self.read_mem_from_cache = read_mem_from_cache 
         self.mem_at_end = mem_at_end
 
         self.attn_type = attn_type
