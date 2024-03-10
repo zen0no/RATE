@@ -99,7 +99,8 @@ class MemTransformerLM(nn.Module):
                                               )
             
         if self.mode == 'doom':
-            self.head = nn.Sequential(*([nn.Linear(d_embed, 5)] + ([nn.Tanh()])))
+            #self.head = nn.Sequential(*([nn.Linear(d_embed, 5)] + ([nn.Tanh()])))
+            self.head = nn.Sequential(*([nn.Linear(d_embed, self.ACTION_DIM)] + ([nn.Tanh()])))
             self.state_encoder = nn.Sequential(nn.Conv2d(3, 32, 8, stride=4, padding=0),
                                                nn.ReLU(),
                                                nn.Conv2d(32, 64, 4, stride=2, padding=0),
@@ -211,7 +212,7 @@ class MemTransformerLM(nn.Module):
                         self.crit.out_projs[i] = self.word_emb.emb_projs[i]
                         # self.crit.out_projs[i] = getattr(self.word_emb, f'emb_projs_{i}')
 
-        self.same_length = same_length
+        self.same_length = same_length 
         self.clamp_len = clamp_len
 
         self._create_params()
@@ -241,7 +242,7 @@ class MemTransformerLM(nn.Module):
         self.tgt_len = tgt_len
         self.mem_len = mem_len
         self.ext_len = ext_len
-
+ 
     def init_mems(self, device):
         if self.mem_len > 0:
             mems = []
@@ -526,7 +527,7 @@ class MemTransformerLM(nn.Module):
                 B, B1, C, H, W = states.shape
                 states = states.reshape(-1, C, H, W).type(torch.float32).contiguous() 
             else:
-                B, B1, C = states.shape
+                B, B1, C = states.shape 
 
             state_embeddings = self.state_encoder(states) # (batch * block_size, n_embd)
 
@@ -684,6 +685,7 @@ class MemTransformerLM(nn.Module):
                 
             if self.mode == 'doom':
                 #print(logits.shape, target.shape)
+                target = torch.argmax(target, dim=-1).unsqueeze(-1)
                 loss = F.cross_entropy(logits.reshape(-1, logits.size(-1)),
                                        target.reshape(-1).long())
 

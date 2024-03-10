@@ -191,7 +191,7 @@ def get_returns_VizDoom(model, ret, seed, episode_timeout, context_length, devic
                     target_return = target_return[:,-prompt_steps:]#+3600.
                     timesteps = timesteps[:, -prompt_steps:]
                     
-                if t%(context_length)==0 and t>5:
+                if t%(context_length)==0 and t>5: 
                     if create_video:
                         out = torch.norm(mem_tokens).item() if mem_tokens is not None else None
                         print(f't: {t}, NEW MEMORY: {out}')
@@ -247,9 +247,13 @@ def get_returns_VizDoom(model, ret, seed, episode_timeout, context_length, devic
         
         # print(np.round(torch.softmax(sampled_action, dim=-1).squeeze().detach().cpu().numpy(), 3))
         if not use_argmax:
-            act = np.random.choice([0, 1, 2, 3, 4], p=torch.softmax(sampled_action, dim=-1).squeeze().detach().cpu().numpy())
+            act = np.random.choice([3, 4], p=torch.softmax(sampled_action, dim=-1).squeeze().detach().cpu().numpy())
         else:
             act = np.argmax(torch.softmax(sampled_action, dim=-1).squeeze().detach().cpu().numpy())
+            if act == 0:
+                act = 3
+            elif act == 1:
+                act = 4
         
         actions[-1] = act
         act_list.append(act)

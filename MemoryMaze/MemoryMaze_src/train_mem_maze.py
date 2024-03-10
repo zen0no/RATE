@@ -7,7 +7,7 @@ import torch
 import torch.nn as nn
 import wandb
 import argparse
-import yaml
+import yaml 
 import pickle
 from torch.utils.data import random_split, DataLoader
 
@@ -76,19 +76,20 @@ if __name__ == '__main__':
 
         print(f"Selected Architecture: {config['arctitecture_mode']}")  
 
+        max_segments = config["training_config"]["sections"]
+
         """ MODEL MODE """
         if config["model_mode"] == "RATE": 
             config["model_config"]["mem_len"] = 2 ########################### 2 FOR DTXL 0
             config["model_config"]["mem_at_end"] = True ########################### True FOR DTXL False
             max_length = config["training_config"]["sections"]*config["training_config"]["context_length"]
-            max_segments = config["training_config"]["sections"]
+        
 
         elif config["model_mode"] == "DT":
             config["model_config"]["mem_len"] = 0 ########################### 2 FOR DTXL 0
             config["model_config"]["mem_at_end"] = False ########################### True FOR DTXL False
             config["model_config"]["num_mem_tokens"] = 0
             config["training_config"]["context_length"] = config["training_config"]["context_length"] * config["training_config"]["sections"]
-            max_segments = config["training_config"]["sections"]
             config["training_config"]["sections"] = 1
             max_length = config["training_config"]["context_length"]
 
@@ -97,7 +98,6 @@ if __name__ == '__main__':
             config["model_config"]["mem_at_end"] = False
             config["model_config"]["num_mem_tokens"] = 0
             config["training_config"]["context_length"] = config["training_config"]["context_length"] * config["training_config"]["sections"]
-            max_segments = config["training_config"]["sections"]
             config["training_config"]["sections"] = 1
             max_length = config["training_config"]["context_length"]
 
@@ -105,7 +105,6 @@ if __name__ == '__main__':
             config["model_config"]["mem_len"] = 0
             config["model_config"]["mem_at_end"] = True
             max_length = config["training_config"]["sections"]*config["training_config"]["context_length"]
-            max_segments = config["training_config"]["sections"]
 
         print(f"Selected Model: {config['model_mode']}") 
 

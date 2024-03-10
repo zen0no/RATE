@@ -6,7 +6,7 @@ from tqdm import tqdm
 from RATE_GTrXL import mem_transformer_v2_GTrXL
 from VizDoom.VizDoom_src.utils import z_normalize, inverse_z_normalize
 from VizDoom.VizDoom_src.inference.val_vizdoom import get_returns_VizDoom
-from MemoryMaze.MemoryMaze_src.inference.val_mem_maze import get_returns_MemoryMaze
+from MemoryMaze.MemoryMaze_src.inference.val_mem_maze import get_returns_MemoryMaze 
 from TMaze_new.TMaze_new_src.utils import seeds_list
 
 def train(ckpt_path, config, train_dataloader, mean, std, max_segments):
@@ -31,9 +31,7 @@ def train(ckpt_path, config, train_dataloader, mean, std, max_segments):
     wandb_step  = 0
 
     optimizer = torch.optim.AdamW(model.parameters(), 
-                                  lr=config["training_config"]["learning_rate"], 
-                                  weight_decay=config["training_config"]["weight_decay"], 
-                                  betas=(0.9, 0.999))
+                                  lr=config["training_config"]["learning_rate"], weight_decay=config["training_config"]["weight_decay"], betas=(config["training_config"]["beta_1"], config["training_config"]["beta_2"]))
     scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lambda steps: min((steps+1)/config["training_config"]["warmup_steps"], 1))
     raw_model = model.module if hasattr(model, "module") else model
         
@@ -113,7 +111,9 @@ def train(ckpt_path, config, train_dataloader, mean, std, max_segments):
             it_counter += 1 
             
         #if model.flag == 1:
-        pbar.set_description(f"ep {epoch+1} it {it} tTotal {train_loss.item():.2f} lr {lr:e}")     
+        pbar.set_description(f"ep {epoch+1} it {it} tTotal {train_loss.item():.2f} lr {lr:e}")
+        if wwandb:
+            wandb.log({"epochs": epoch+1})
         
         # Scheduler changer
         if it_counter >= config["training_config"]["warmup_steps"] and switch == False:
@@ -125,7 +125,7 @@ def train(ckpt_path, config, train_dataloader, mean, std, max_segments):
             switch = True
         
         # Save
-        if (epoch + 1) % 100 == 0 or epoch == config["training_config"]["epochs"] - 1 or (epoch + 1) == 50 or (epoch + 1) == 25 or (epoch + 1) == 1:
+        if (epoch + 1) % 100 == 0 or epoch == config["training_config"]["epochs"] - 1 or (epoch + 1) == 1:
             if config["training_config"]["online_inference"] == True:
                 if config["model_config"]["mode"] == 'doom':
                     model.eval()

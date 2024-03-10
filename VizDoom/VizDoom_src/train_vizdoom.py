@@ -33,12 +33,12 @@ with open("VizDoom/VizDoom_src/config.yaml") as f:
 # python3 VizDoom/VizDoom_src/train_vizdoom.py --model_mode 'RATE' --arch_mode 'TrXL' --ckpt_folder 'trash'
 
 def create_args():
-    parser = argparse.ArgumentParser(description='RATE VizDoom trainer')
+    parser = argparse.ArgumentParser(description='RATE VizDoom trainer') 
 
     parser.add_argument('--model_mode',     type=str, default='RATE',  help='Model training mode. Available variants: "DT, DTXL, RATE (Ours), RATEM (RMT)"')    
     parser.add_argument('--arch_mode',      type=str, default='TrXL',  help='Model architecture mode. Available variants: "TrXL", "TrXL-I", "GTrXL"')
     parser.add_argument('--start_seed',     type=int, default=1,       help='Start seed')
-    parser.add_argument('--end_seed',       type=int, default=5,       help='End seed')
+    parser.add_argument('--end_seed',       type=int, default=3,       help='End seed')
     parser.add_argument('--ckpt_folder',    type=str, default='ckpt',  help='Checkpoints directory')
 
     return parser
@@ -76,7 +76,7 @@ if __name__ == '__main__':
     # RUN = 1
     for RUN in range(start_seed, end_seed+1):
         set_seed(RUN)
-        print(f"Random seed set as {RUN}")
+        print(f"Random seed set as {RUN}") 
 
         """ ARCHITECTURE MODE """
         if config["arctitecture_mode"] == "TrXL":
@@ -91,28 +91,28 @@ if __name__ == '__main__':
 
         print(f"Selected Architecture: {config['arctitecture_mode']}")  
 
+        max_segments = config["training_config"]["sections"]
+
         """ MODEL MODE """
         if config["model_mode"] == "RATE": 
             config["model_config"]["mem_len"] = 2 ########################### 2 FOR DTXL 0
             config["model_config"]["mem_at_end"] = True ########################### True FOR DTXL False
             max_length = config["training_config"]["sections"]*config["training_config"]["context_length"]
-            max_segments = config["training_config"]["sections"]
+        
 
         elif config["model_mode"] == "DT":
             config["model_config"]["mem_len"] = 0 ########################### 2 FOR DTXL 0
             config["model_config"]["mem_at_end"] = False ########################### True FOR DTXL False
             config["model_config"]["num_mem_tokens"] = 0
             config["training_config"]["context_length"] = config["training_config"]["context_length"] * config["training_config"]["sections"]
-            max_segments = config["training_config"]["sections"]
             config["training_config"]["sections"] = 1
             max_length = config["training_config"]["context_length"]
 
         elif config["model_mode"] == "DTXL":
             config["model_config"]["mem_len"] = 2
             config["model_config"]["mem_at_end"] = False
-            config["model_config"]["num_mem_tokens"] = 0
+            config["model_config"]["num_mem_tokens"] = 0 
             config["training_config"]["context_length"] = config["training_config"]["context_length"] * config["training_config"]["sections"]
-            max_segments = config["training_config"]["sections"]
             config["training_config"]["sections"] = 1
             max_length = config["training_config"]["context_length"]
 
@@ -120,12 +120,12 @@ if __name__ == '__main__':
             config["model_config"]["mem_len"] = 0
             config["model_config"]["mem_at_end"] = True
             max_length = config["training_config"]["sections"]*config["training_config"]["context_length"]
-            max_segments = config["training_config"]["sections"]
+        
 
         print(f"Selected Model: {config['model_mode']}")  
 
 
-        TEXT_DESCRIPTION = "good"
+        TEXT_DESCRIPTION = "final"
         mini_text = f"arch_mode_{config['arctitecture_mode']}"
         now = datetime.datetime.now()
         date_time = now.strftime("%Y-%m-%d_%H-%M-%S").replace('-', '_')

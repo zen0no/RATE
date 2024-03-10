@@ -7,8 +7,10 @@ data_config:
   normalize: True
 
 training_config:
-  learning_rate: 0.001 # 1e-3
-  weight_decay: 0.0001
+  learning_rate: 0.0003 # 1e-3
+  beta_1: 0.9
+  beta_2: 0.95
+  weight_decay: 0.1
   batch_size: 128 # 128
   warmup_steps: 80  # 50
   grad_norm_clip: 1.0 # 1.0
@@ -26,10 +28,10 @@ training_config:
 model_config:
   mode: "doom"
   STATE_DIM: 3
-  ACTION_DIM: 1
+  ACTION_DIM: 2
   n_token: 10000 # vocab_size
-  n_layer: 3 # 3
-  n_head: 1 # 1
+  n_layer: 6 # 3
+  n_head: 8 # 1
   d_model: 128 # 128
   d_head: 128 # 128 # divider of d_model
   d_inner: 128 # 128 # > d_model
