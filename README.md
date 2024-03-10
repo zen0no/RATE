@@ -1,7 +1,7 @@
 # Recurrent Action Transformer with Memory (RATE) 
 - [x] TMaze (done)
 - [x] VizDoom (done)
-- [ ] Memory Maze (in progress)
+- [ ] Memory Maze (90% done)
 
 ### Installing dependencies:
 ```bash
