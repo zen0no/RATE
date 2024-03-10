@@ -38,7 +38,7 @@ def create_args():
     parser.add_argument('--model_mode',     type=str, default='RATE',  help='Model training mode. Available variants: "DT, DTXL, RATE (Ours), RATEM (RMT)"')    
     parser.add_argument('--arch_mode',      type=str, default='TrXL',  help='Model architecture mode. Available variants: "TrXL", "TrXL-I", "GTrXL"')
     parser.add_argument('--start_seed',     type=int, default=1,       help='Start seed')
-    parser.add_argument('--end_seed',       type=int, default=6,       help='End seed')
+    parser.add_argument('--end_seed',       type=int, default=3,       help='End seed')
     parser.add_argument('--ckpt_folder',    type=str, default='ckpt',  help='Checkpoints directory')
 
     return parser
@@ -109,7 +109,7 @@ if __name__ == '__main__':
         print(f"Selected Model: {config['model_mode']}") 
 
 
-        TEXT_DESCRIPTION = ""
+        TEXT_DESCRIPTION = "final"
         mini_text = f"arch_mode_{config['arctitecture_mode']}"
         now = datetime.datetime.now()
         date_time = now.strftime("%Y-%m-%d_%H-%M-%S").replace('-', '_')

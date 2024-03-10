@@ -125,7 +125,7 @@ def train(ckpt_path, config, train_dataloader, mean, std, max_segments):
             switch = True
         
         # Save
-        if (epoch + 1) % 100 == 0 or epoch == config["training_config"]["epochs"] - 1 or (epoch + 1) == 1:
+        if (epoch + 1) % config["training_config"]["epochs"] == 0 or epoch == config["training_config"]["epochs"] - 1 or (epoch + 1) == 1:
             if config["training_config"]["online_inference"] == True:
                 if config["model_config"]["mode"] == 'doom':
                     model.eval()
@@ -148,6 +148,7 @@ def train(ckpt_path, config, train_dataloader, mean, std, max_segments):
 
                         if wwandb:
                             wandb.log({"LifeTime":  np.mean(ts), "return": np.mean(returns)})
+
                 elif config["model_config"]["mode"] == 'memory_maze':
                     model.eval()
                     for ret in [config["online_inference_config"]["desired_return"]]:

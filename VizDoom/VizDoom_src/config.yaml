@@ -15,6 +15,7 @@ training_config:
   warmup_steps: 80  # 50
   grad_norm_clip: 1.0 # 1.0
   epochs: 500 #250
+  ckpt_epoch: 100
   use_erl_stop: True
   # inference during training
   online_inference: True
