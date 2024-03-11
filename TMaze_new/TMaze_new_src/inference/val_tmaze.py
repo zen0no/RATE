@@ -80,7 +80,7 @@ def get_returns_TMaze(model, ret, seed, episode_timeout, corridor_length, contex
         rewards = torch.cat([rewards, torch.zeros(1, device=device)])
         
         act_new_segment = False
-        if config["model_mode"] != 'DT':
+        if config["model_mode"] != 'DT' and config["model_mode"] != 'DTXL':
             if actions.shape[0] > HISTORY_LEN:
                 segment+=1
                 

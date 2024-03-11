@@ -31,7 +31,8 @@ def train(ckpt_path, config, train_dataloader, mean, std, max_segments):
     wandb_step  = 0
 
     optimizer = torch.optim.AdamW(model.parameters(), 
-                                  lr=config["training_config"]["learning_rate"], weight_decay=config["training_config"]["weight_decay"], betas=(config["training_config"]["beta_1"], config["training_config"]["beta_2"]))
+                                  lr=config["training_config"]["learning_rate"], weight_decay=config["training_config"]["weight_decay"], 
+                                  betas=(config["training_config"]["beta_1"], config["training_config"]["beta_2"]))
     scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lambda steps: min((steps+1)/config["training_config"]["warmup_steps"], 1))
     raw_model = model.module if hasattr(model, "module") else model
         
@@ -120,12 +121,12 @@ def train(ckpt_path, config, train_dataloader, mean, std, max_segments):
             #scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, factor=learning_rate_decay, patience=patience, mode="min")
             scheduler = torch.optim.lr_scheduler.LinearLR(optimizer, 
                                                           start_factor=1.0, 
-                                                          end_factor=0.01,
+                                                          end_factor=config["training_config"]["lr_end_factor"],
                                                           total_iters=max_segments*len(train_dataloader)*config["training_config"]["epochs"])
             switch = True
         
         # Save
-        if (epoch + 1) % config["training_config"]["epochs"] == 0 or epoch == config["training_config"]["epochs"] - 1 or (epoch + 1) == 1:
+        if ((epoch + 1) % int(config["training_config"]["ckpt_epoch"])) == 0 or epoch == config["training_config"]["epochs"] - 1 or (epoch + 1) == 1:
             if config["training_config"]["online_inference"] == True:
                 if config["model_config"]["mode"] == 'doom':
                     model.eval()

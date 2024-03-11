@@ -21,9 +21,11 @@ def train(model, optimizer, scheduler, raw_model, new_segment, epochs_counter, s
         wandb_step  = 0
         epochs_counter = 0
         
-        optimizer = torch.optim.AdamW(model.parameters(), lr=config["training_config"]["learning_rate"],  weight_decay=config["training_config"]["weight_decay"], betas=(0.9, 0.999))
+        optimizer = torch.optim.AdamW(model.parameters(), lr=config["training_config"]["learning_rate"], 
+                                      weight_decay=config["training_config"]["weight_decay"], 
+                                      betas=(config["training_config"]["beta_1"], config["training_config"]["beta_2"]))
         #scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lambda steps: min((steps+1)/config["warmup_steps"], 1))
-        scheduler = FactorScheduler(optimizer, factor=1.0, stop_factor_lr=0.1, 
+        scheduler = FactorScheduler(optimizer, factor=1.0, stop_factor_lr=config["training_config"]["lr_end_factor"], 
                                     base_lr=config["training_config"]["learning_rate"], total_iterations = config["training_config"]["epochs"] * config["training_config"]["max_segments"],
                                     max_segments = config["training_config"]['max_segments'], warmup_steps=config["training_config"]["warmup_steps"], max_epochs=config["training_config"]["epochs"])
         raw_model = model.module if hasattr(model, "module") else model
@@ -49,9 +51,9 @@ def train(model, optimizer, scheduler, raw_model, new_segment, epochs_counter, s
     best_val_loss = np.inf
     epochs_without_improvement = 0
     max_epochs_without_improvement = 50
-    block_size = 3*config["training_config"]["context_length"]
+
     EFFECTIVE_SIZE_BLOCKS = config["training_config"]["context_length"] * config["training_config"]["sections"]
-    BLOCKS_CONTEXT = block_size // 3
+    BLOCKS_CONTEXT = config["training_config"]["context_length"]
 
     scheduler.warmup_steps *= EFFECTIVE_SIZE_BLOCKS//BLOCKS_CONTEXT # !
     scheduler.total_iterations *= EFFECTIVE_SIZE_BLOCKS//BLOCKS_CONTEXT # !
@@ -68,32 +70,20 @@ def train(model, optimizer, scheduler, raw_model, new_segment, epochs_counter, s
             memory = None
             mem_tokens = None
             
-            if config["model_mode"] == 'DT':
-                block_part_range = range(1)
-            else:
-                block_part_range = range(EFFECTIVE_SIZE_BLOCKS//BLOCKS_CONTEXT)
+            block_part_range = range(EFFECTIVE_SIZE_BLOCKS//BLOCKS_CONTEXT)
                 
             for block_part in block_part_range:
-                if config["model_mode"] == 'DT':
-                    x1 = s.to(device)
-                    y1 = a.to(device).float()
-                    r1 = rtg.to(device).float()
-                    t1 = timesteps.to(device)
-                    masks1 = masks.to(device)
-                else:
-                    from_idx = block_part*(BLOCKS_CONTEXT)
-                    to_idx = (block_part+1)*(BLOCKS_CONTEXT)
-                    x1 = s[:, from_idx:to_idx, :].to(device)
-                    y1 = a[:, from_idx:to_idx, :].to(device).float()
-                    r1 = rtg[:,:,:][:, from_idx:to_idx, :].to(device).float() 
-                    t1 = timesteps[:, from_idx:to_idx].to(device)
-                    masks1 = masks[:, from_idx:to_idx].to(device)
-                # print('2', x1.shape)
-                if block_part == list(range(EFFECTIVE_SIZE_BLOCKS//BLOCKS_CONTEXT))[-1] or config["model_mode"] == 'DT':
-                    model.flag = 1 
-                else:
-                    model.flag = 0
+                from_idx = block_part*(BLOCKS_CONTEXT)
+                to_idx = (block_part+1)*(BLOCKS_CONTEXT)
 
+                x1 = s[:, from_idx:to_idx, :].to(device)
+                y1 = a[:, from_idx:to_idx, :].to(device).float()
+                r1 = rtg[:,:,:][:, from_idx:to_idx, :].to(device).float() 
+                t1 = timesteps[:, from_idx:to_idx].to(device)
+                masks1 = masks[:, from_idx:to_idx].to(device)
+
+                # print('2', x1.shape)
+                model.flag = 1 if block_part == max(block_part_range) else 0
                 if mem_tokens is not None:
                     mem_tokens = mem_tokens.detach()
                 elif raw_model.mem_tokens is not None:
@@ -144,33 +134,19 @@ def train(model, optimizer, scheduler, raw_model, new_segment, epochs_counter, s
                 memory = None
                 mem_tokens = None
                 #print('3', s.shape)
-                if config["model_mode"] == 'DT':
-                    block_part_range = range(1)
-                else:
-                    block_part_range = range(EFFECTIVE_SIZE_BLOCKS//BLOCKS_CONTEXT)
+                block_part_range = range(EFFECTIVE_SIZE_BLOCKS//BLOCKS_CONTEXT)
                     
                 for block_part in block_part_range:
-                    if config["model_mode"] == 'DT':
-                        x1 = s.to(device)
-                        y1 = a.to(device).float()
-                        r1 = rtg.to(device).float()
-                        t1 = timesteps.to(device)
-                        masks1 = masks.to(device)
-                    else:
-                        from_idx = block_part*(BLOCKS_CONTEXT)
-                        to_idx = (block_part+1)*(BLOCKS_CONTEXT)
-                        x1 = s[:, from_idx:to_idx, :].to(device)
-                        y1 = a[:, from_idx:to_idx, :].to(device).float()
-                        r1 = rtg[:,:,:][:, from_idx:to_idx, :].to(device).float() 
-                        t1 = timesteps[:, from_idx:to_idx].to(device)
-                        masks1 = masks[:, from_idx:to_idx].to(device)
+                    from_idx = block_part*(BLOCKS_CONTEXT)
+                    to_idx = (block_part+1)*(BLOCKS_CONTEXT)
+                    x1 = s[:, from_idx:to_idx, :].to(device)
+                    y1 = a[:, from_idx:to_idx, :].to(device).float()
+                    r1 = rtg[:,:,:][:, from_idx:to_idx, :].to(device).float() 
+                    t1 = timesteps[:, from_idx:to_idx].to(device)
+                    masks1 = masks[:, from_idx:to_idx].to(device)
                         
                     #print('4', x1.shape)
-                    if block_part == list(range(EFFECTIVE_SIZE_BLOCKS//BLOCKS_CONTEXT))[-1] or config["model_mode"] == 'DT':
-                        model.flag = 1 
-                    else:
-                        model.flag = 0
-
+                    model.flag = 1 if block_part == max(block_part_range) else 0
                     if mem_tokens is not None:
                         mem_tokens = mem_tokens.detach()
                     elif raw_model.mem_tokens is not None:
@@ -217,8 +193,8 @@ def train(model, optimizer, scheduler, raw_model, new_segment, epochs_counter, s
             wandb.log({"segments_count": segments_count})
         
         # Save 
-        if (epoch + 1) % 50 == 0 or epoch == config["training_config"]["epochs"] - 1:
-            if config["training_config"]["online_inference"] == True:
+        if ((epoch + 1) % int(config["training_config"]["ckpt_epoch"])) == 0 or epoch == config["training_config"]["epochs"] - 1:
+            if config["training_config"]["online_inference"]:
                 model.eval()
                 with torch.no_grad():
                     goods, bads = 0, 0

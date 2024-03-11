@@ -1,4 +1,3 @@
-import os
 import datetime
 import wandb
 from torch.utils.data import random_split, DataLoader
@@ -13,7 +12,6 @@ parent_dir = os.path.dirname(current_dir)
 parent_dir = os.path.dirname(parent_dir)
 sys.path.append(parent_dir)
 
-#from TMaze_new.TMaze_new_src.utils.tmaze_new_dataset import TMaze_data_generator, CombinedDataLoader
 from TMaze_new.TMaze_new_src.utils import set_seed, get_intro, TMaze_data_generator, CombinedDataLoader
 from TMaze_new.TMaze_new_src.train import train
 
@@ -80,14 +78,21 @@ if __name__ == '__main__':
         if config["model_mode"] == "RATE": 
             config["model_config"]["mem_len"] = 2 ########################### 2 FOR DTXL 0
             config["model_config"]["mem_at_end"] = True ########################### True FOR DTXL False
+
         elif config["model_mode"] == "DT":
             config["model_config"]["mem_len"] = 0 ########################### 2 FOR DTXL 0
             config["model_config"]["mem_at_end"] = False ########################### True FOR DTXL False
             config["model_config"]["num_mem_tokens"] = 0
+            config["training_config"]["context_length"] = config["training_config"]["context_length"] * config["training_config"]["sections"]
+            config["training_config"]["sections"] = 1
+
         elif config["model_mode"] == "DTXL":
             config["model_config"]["mem_len"] = 2
             config["model_config"]["mem_at_end"] = False
             config["model_config"]["num_mem_tokens"] = 0
+            config["training_config"]["context_length"] = config["training_config"]["context_length"] * config["training_config"]["sections"]
+            config["training_config"]["sections"] = 1
+
         elif config["model_mode"] == "RATEM":
             config["model_config"]["mem_len"] = 0
             config["model_config"]["mem_at_end"] = True
@@ -121,11 +126,23 @@ if __name__ == '__main__':
         if config["training_config"]["curriculum"].lower() == 'true':
             print("MODE: CURRICULUM")
             for n_final in range(min_n_final, max_n_final+1):
-                config["training_config"]["sections"] = n_final
 
-                combined_dataloader = CombinedDataLoader(n_init=min_n_final, n_final=config["training_config"]["sections"], multiplier=config["data_config"]["multiplier"], 
-                                                        hint_steps=config["data_config"]["hint_steps"], batch_size=config["training_config"]["batch_size"], mode="", 
-                                                        cut_dataset=config["data_config"]["cut_dataset"], desired_reward=config["data_config"]["desired_reward"], win_only=config["data_config"]["win_only"])
+                n_fin = n_final
+                
+                if config["model_mode"] != "DT" and config["model_mode"] != "DTXL":
+                    config["training_config"]["sections"] = n_final
+                else:
+                    config["training_config"]["sections"] = 1
+
+                combined_dataloader = CombinedDataLoader(n_init=min_n_final, 
+                                                         n_final=n_fin, 
+                                                         multiplier=config["data_config"]["multiplier"], 
+                                                         hint_steps=config["data_config"]["hint_steps"], 
+                                                         batch_size=config["training_config"]["batch_size"],
+                                                         mode="", 
+                                                         cut_dataset=config["data_config"]["cut_dataset"], 
+                                                         desired_reward=config["data_config"]["desired_reward"], 
+                                                         win_only=config["data_config"]["win_only"])
 
                 # Split dataset into train and validation sets
                 full_dataset = combined_dataloader.dataset
@@ -149,10 +166,25 @@ if __name__ == '__main__':
                 
         elif config["training_config"]["curriculum"].lower() == 'false':
             print("MODE: CLASSIC")
-            config["training_config"]["sections"] = max_n_final
-            combined_dataloader = CombinedDataLoader(n_init=min_n_final, n_final=config["training_config"]["sections"], multiplier=config["data_config"]["multiplier"], 
-                                                    hint_steps=config["data_config"]["hint_steps"], batch_size=config["training_config"]["batch_size"], mode="", 
-                                                    cut_dataset=config["data_config"]["cut_dataset"], one_mixed_dataset=True, desired_reward=config["data_config"]["desired_reward"], win_only=config["data_config"]["win_only"])
+            
+            n_fin = max_n_final
+            
+            if config["model_mode"] != "DT" and config["model_mode"] != "DTXL":
+                config["training_config"]["sections"] = max_n_final
+            else:
+                config["training_config"]["sections"] = 1
+
+            combined_dataloader = CombinedDataLoader(n_init=min_n_final, 
+                                                     n_final=n_fin, 
+                                                     multiplier=config["data_config"]["multiplier"], 
+                                                     hint_steps=config["data_config"]["hint_steps"], 
+                                                     batch_size=config["training_config"]["batch_size"], 
+                                                     mode="", 
+                                                     cut_dataset=config["data_config"]["cut_dataset"], 
+                                                     one_mixed_dataset=True, 
+                                                     desired_reward=config["data_config"]["desired_reward"], 
+                                                     win_only=config["data_config"]["win_only"])
+            
             # Split dataset into train and validation sets
             full_dataset = combined_dataloader.dataset
             train_size = int(0.8 * len(full_dataset))

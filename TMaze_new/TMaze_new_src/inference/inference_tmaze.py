@@ -6,6 +6,7 @@ import argparse
 import pandas as pd
 import re
 import yaml
+
 import os
 import sys
 current_dir = os.path.dirname(__file__)
@@ -68,19 +69,26 @@ if __name__ == '__main__':
     if config["model_mode"] == "RATE": 
         config["model_config"]["mem_len"] = 2 ########################### 2 FOR DTXL 0
         config["model_config"]["mem_at_end"] = True ########################### True FOR DTXL False
+
     elif config["model_mode"] == "DT":
         config["model_config"]["mem_len"] = 0 ########################### 2 FOR DTXL 0
         config["model_config"]["mem_at_end"] = False ########################### True FOR DTXL False
         config["model_config"]["num_mem_tokens"] = 0
+        config["training_config"]["context_length"] = config["training_config"]["context_length"] * config["training_config"]["sections"]
+        config["training_config"]["sections"] = 1
+
     elif config["model_mode"] == "DTXL":
         config["model_config"]["mem_len"] = 2
         config["model_config"]["mem_at_end"] = False
         config["model_config"]["num_mem_tokens"] = 0
+        config["training_config"]["context_length"] = config["training_config"]["context_length"] * config["training_config"]["sections"]
+        config["training_config"]["sections"] = 1
+
     elif config["model_mode"] == "RATEM":
         config["model_config"]["mem_len"] = 0
         config["model_config"]["mem_at_end"] = True
 
-    print(f"Selected Model: {config['model_mode']}")  
+    print(f"Selected Model: {config['model_mode']}, Context length: {config['training_config']['context_length']}") 
 
     model = mem_transformer_v2_GTrXL.MemTransformerLM(**config["model_config"])
 

@@ -44,10 +44,12 @@ for dir in */; do
             new_string+="$el"_
         done
         new_string="${new_string%_}"
-        new_string_no_run="${new_string%_*}"
+        new_string_no_run="${new_string#*_}"
+
+        max_segments_value=${max_segments#*_}
 
         python3 TMaze_new/TMaze_new_src/inference/inference_tmaze.py --model_mode "${mode%/}" \
-                                                           --max_n_final 12 \
+                                                           --max_n_final $max_segments_value \
                                                            --ckpt_name "${dir%/}" \
                                                            --ckpt_chooser 0 \
                                                            --ckpt_folder "${ckpt_folder%/}" \
