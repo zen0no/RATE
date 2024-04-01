@@ -15,6 +15,8 @@ sys.path.append(parent_dir)
 from TMaze_new.TMaze_new_src.utils import set_seed, get_intro, TMaze_data_generator, CombinedDataLoader
 from TMaze_new.TMaze_new_src.train import train
 
+# python3 TMaze_new/TMaze_new_src/train_tmaze.py --model_mode 'RATE' --arch_mode 'TrXL' --curr 'true' --ckpt_folder 'RATE_ca_max_3' --max_n_final 3
+
 os.environ["MKL_NUM_THREADS"] = "1" 
 os.environ["NUMEXPR_NUM_THREADS"] = "1"  
 os.environ["OMP_NUM_THREADS"] = "1" 
@@ -99,7 +101,7 @@ if __name__ == '__main__':
 
         print(f"Selected Model: {config['model_mode']}")  
 
-        TEXT_DESCRIPTION = ""
+        TEXT_DESCRIPTION = "GRU"
         mini_text = f"arch_mode_{config['arctitecture_mode']}"
         now = datetime.datetime.now()
         date_time = now.strftime("%Y-%m-%d_%H-%M-%S").replace('-', '_')

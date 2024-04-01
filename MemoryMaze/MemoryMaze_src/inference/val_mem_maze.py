@@ -4,6 +4,8 @@ import gym
 gym.logger.set_level(40)
 import logging
 logging.disable(logging.WARNING)
+from warnings import filterwarnings
+filterwarnings(action='ignore', category=DeprecationWarning, message='`np.bool` is a deprecated alias')
 
 from TMaze_new.TMaze_new_src.utils import set_seed
 from VizDoom.VizDoom_src.utils import z_normalize, inverse_z_normalize

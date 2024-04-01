@@ -3,7 +3,10 @@ import wandb
 from tqdm import tqdm
 import numpy as np
 
-from RATE_GTrXL import mem_transformer_v2_GTrXL
+# from RATE_GTrXL import mem_transformer_v2_GTrXL
+# from RATE_GTrXL import mem_transformer_v2_GTrXL_ca
+from RATE_GTrXL import mem_transformer_v2_GTrXL_gru
+
 from TMaze_new.TMaze_new_src.inference.val_tmaze import get_returns_TMaze
 from TMaze_new.TMaze_new_src.utils.additional2 import plot_cringe 
 from TMaze_new.TMaze_new_src.utils import seeds_list
@@ -13,7 +16,7 @@ def train(model, optimizer, scheduler, raw_model, new_segment, epochs_counter, s
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     # Use the config dictionary to initialize the model
     if model is None:
-        model = mem_transformer_v2_GTrXL.MemTransformerLM(**config["model_config"])
+        model = mem_transformer_v2_GTrXL_gru.MemTransformerLM(**config["model_config"])
 
         model.loss_last_coef = config["training_config"]["coef"]
         torch.nn.init.xavier_uniform_(model.r_w_bias);
@@ -193,7 +196,7 @@ def train(model, optimizer, scheduler, raw_model, new_segment, epochs_counter, s
             wandb.log({"segments_count": segments_count})
         
         # Save 
-        if ((epoch + 1) % int(config["training_config"]["ckpt_epoch"])) == 0 or epoch == config["training_config"]["epochs"] - 1:
+        if ((epoch + 1) % int(config["training_config"]["ckpt_epoch"])) == 0 or epoch == config["training_config"]["epochs"] - 1 or epoch == 0:
             if config["training_config"]["online_inference"]:
                 model.eval()
                 with torch.no_grad():
@@ -203,9 +206,16 @@ def train(model, optimizer, scheduler, raw_model, new_segment, epochs_counter, s
                     seeds = seeds_list
                     pbar2 = range(len(seeds))
                     for indx, iii in enumerate(pbar2):
-                        episode_return, act_list, t, _ , delta_t, attn_map = get_returns_TMaze(model=model, ret=1.0, seed=seeds[iii], episode_timeout=config["episode_timeout"],
-                                                                                                corridor_length=config["corridor_length"], context_length=config["context_length"],
-                                                                                                device=device, act_dim=config["act_dim"], config=config, create_video=False)
+                        # episode_return, act_list, t, _ , delta_t, attn_map = get_returns_TMaze(model=model, ret=1.0, seed=seeds[iii], episode_timeout=config["episode_timeout"],
+                        #                                                                         corridor_length=config["corridor_length"], context_length=config["context_length"],
+                        #                                                                         device=device, act_dim=config["act_dim"], config=config, create_video=False)
+                        episode_return, act_list, t, _ , delta_t, attn_map = get_returns_TMaze(model=model, ret=config["data_config"]["desired_reward"], 
+                                                                                               seed=seeds[iii], 
+                                                                                               episode_timeout=config["online_inference_config"]["episode_timeout"],
+                                                                                               corridor_length=config["online_inference_config"]["corridor_length"], 
+                                                                                               context_length=config["training_config"]["context_length"],
+                                                                                               device=device, act_dim=config["model_config"]["ACTION_DIM"],
+                                                                                               config=config, create_video=False)
                         if episode_return == config["data_config"]["desired_reward"]:
                             goods += 1
                         else:

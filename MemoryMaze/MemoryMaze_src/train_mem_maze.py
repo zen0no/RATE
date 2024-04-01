@@ -10,6 +10,10 @@ import argparse
 import yaml 
 import pickle
 from torch.utils.data import random_split, DataLoader
+import logging
+logging.disable(logging.WARNING)
+from warnings import filterwarnings
+filterwarnings(action='ignore', category=DeprecationWarning, message='`np.bool` is a deprecated alias')
 
 import os
 import sys
@@ -109,7 +113,7 @@ if __name__ == '__main__':
         print(f"Selected Model: {config['model_mode']}") 
 
 
-        TEXT_DESCRIPTION = "final"
+        TEXT_DESCRIPTION = "cont180"
         mini_text = f"arch_mode_{config['arctitecture_mode']}"
         now = datetime.datetime.now()
         date_time = now.strftime("%Y-%m-%d_%H-%M-%S").replace('-', '_')

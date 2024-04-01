@@ -118,9 +118,13 @@ class RelPartialLearnableDecoderLayer(nn.Module):
 
     def forward_orig(self, dec_inp, r, r_w_bias, r_r_bias, dec_attn_mask=None, mems=None):
 
+        # print('1', dec_inp[0:5, 0, 0])
+
         output, attn_weights = self.dec_attn(dec_inp, r, r_w_bias, r_r_bias,
                                attn_mask=dec_attn_mask,
                                mems=mems)
+        # print('2', output[0:5, 0, 0])
+        
 
         output = self.layer_norm1(dec_inp+output)
         output2 = self.pos_ff(output)

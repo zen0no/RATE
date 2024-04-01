@@ -1,5 +1,5 @@
 wandb_config:
-    project_name: "RATE_TMaze"
+    project_name: "CA-RATE_TMaze"
     wwandb: True
 
 data_config:
@@ -28,7 +28,7 @@ training_config:
   ckpt_epoch: 50
   use_erl_stop: True
   # inference during training
-  online_inference: False
+  online_inference: True
   # adding weight to the loss on the last valid action
   coef: 0.0
 
@@ -51,8 +51,8 @@ model_config:
   mem_at_end: True
 
 online_inference_config:
-  episode_timeout:
-  corridor_length:
+  episode_timeout: 
+  corridor_length: 
 
 
 
