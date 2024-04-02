@@ -15,7 +15,7 @@ parent_dir = os.path.dirname(parent_dir)
 parent_dir = os.path.dirname(parent_dir)
 sys.path.append(parent_dir)
 
-from RATE_GTrXL import mem_transformer_v2_GTrXL
+from RATE_GTrXL import mem_transformer_v2_GTrXL_gru
 from TMaze_new.TMaze_new_src.inference.val_tmaze import get_returns_TMaze
 from TMaze_new.TMaze_new_src.utils import seeds_list, get_intro2
 
@@ -90,7 +90,7 @@ if __name__ == '__main__':
 
     print(f"Selected Model: {config['model_mode']}, Context length: {config['training_config']['context_length']}") 
 
-    model = mem_transformer_v2_GTrXL.MemTransformerLM(**config["model_config"])
+    model = mem_transformer_v2_GTrXL_gru.MemTransformerLM(**config["model_config"])
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     current_dir = os.getcwd()

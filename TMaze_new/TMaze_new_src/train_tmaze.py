@@ -101,7 +101,7 @@ if __name__ == '__main__':
 
         print(f"Selected Model: {config['model_mode']}")  
 
-        TEXT_DESCRIPTION = "GRU"
+        TEXT_DESCRIPTION = "classic"
         mini_text = f"arch_mode_{config['arctitecture_mode']}"
         now = datetime.datetime.now()
         date_time = now.strftime("%Y-%m-%d_%H-%M-%S").replace('-', '_')
