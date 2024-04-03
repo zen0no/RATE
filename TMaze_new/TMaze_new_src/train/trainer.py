@@ -3,9 +3,10 @@ import wandb
 from tqdm import tqdm
 import numpy as np
 
-from RATE_GTrXL import mem_transformer_v2_GTrXL
-# from RATE_GTrXL import mem_transformer_v2_GTrXL_ca
-# from RATE_GTrXL import mem_transformer_v2_GTrXL_gru
+# from RATE_GTrXL import mem_transformer_v2_GTrXL
+# from RATE_GTrXL import mem_transformer_v2_GTrXL_ca1
+from RATE_GTrXL import mem_transformer_v2_GTrXL_gru
+# from RATE_GTrXL import mem_transformer_v2_GTrXL_ca2
 
 from TMaze_new.TMaze_new_src.inference.val_tmaze import get_returns_TMaze
 from TMaze_new.TMaze_new_src.utils.additional2 import plot_cringe 
@@ -16,7 +17,7 @@ def train(model, optimizer, scheduler, raw_model, new_segment, epochs_counter, s
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     # Use the config dictionary to initialize the model
     if model is None:
-        model = mem_transformer_v2_GTrXL.MemTransformerLM(**config["model_config"])
+        model = mem_transformer_v2_GTrXL_gru.MemTransformerLM(**config["model_config"])
 
         model.loss_last_coef = config["training_config"]["coef"]
         torch.nn.init.xavier_uniform_(model.r_w_bias);

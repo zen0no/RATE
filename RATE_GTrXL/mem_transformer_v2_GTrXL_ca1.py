@@ -155,10 +155,6 @@ class MemTransformerLM(nn.Module):
         self.mem_at_end = mem_at_end
         self.mha_mem_to_mem = MultiHeadAttention(self.d_model, self.d_model, self.d_model, 
                                                  self.d_model, 4, is_causal=False)
-        
-        self.rnn = nn.GRU(self.d_model, self.d_model, batch_first=True)
-        # self.h = torch.zeros(1, 1, self.d_model)
-
         self.attn_type = attn_type
 
         self.layers = nn.ModuleList()
@@ -494,19 +490,13 @@ class MemTransformerLM(nn.Module):
                     tgt_len = token_embeddings.shape[1]
                     mem_tokens_write = hidden[:, -tgt_len-num_mem:-tgt_len, :]
             
-            # # * BEGIN | Cross Attention
-            # new_mem_tokens = hidden[:, -num_mem:, :]
-            # mask_mem_mem = torch.ones((new_mem_tokens.shape[1], new_mem_tokens.shape[1]), dtype=torch.bool).to(new_mem_tokens.device)
-            # mem_tokens_write, _ = self.mha_mem_to_mem(new_mem_tokens, mem_tokens, mem_tokens, attn_mask=mask_mem_mem)
-            # # * END | Cross Attention
-
-            # ! BEGIN | RNN
+            # * BEGIN | Cross Attention
             new_mem_tokens = hidden[:, -num_mem:, :]
-            #self.h = self.h.to(new_mem_tokens.device).repeat(1, new_mem_tokens.shape[0], 1).detach()
-            self.h = torch.zeros((1, new_mem_tokens.shape[0], new_mem_tokens.shape[2]), device=new_mem_tokens.device).detach()
-
-            mem_tokens_write, self.h = self.rnn(new_mem_tokens, self.h)
-            # ! END | RNN
+            mem_tokens = mem_tokens.permute(1,0,2)
+            # print(mem_tokens.shape, new_mem_tokens.shape)
+            mask_mem_mem = torch.ones((new_mem_tokens.shape[1], new_mem_tokens.shape[1]), dtype=torch.bool).to(new_mem_tokens.device)
+            mem_tokens_write, _ = self.mha_mem_to_mem(new_mem_tokens, mem_tokens, mem_tokens, attn_mask=mask_mem_mem)
+            # * END | Cross Attention
 
             # print('1', new_mem_tokens.shape, new_mem_tokens[0, :, 0])
             if self.mem_at_end:

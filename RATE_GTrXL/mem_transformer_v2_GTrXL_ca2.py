@@ -490,11 +490,14 @@ class MemTransformerLM(nn.Module):
                     tgt_len = token_embeddings.shape[1]
                     mem_tokens_write = hidden[:, -tgt_len-num_mem:-tgt_len, :]
             
-            # * BEGIN | Cross Attention
+            # ! BEGIN | Cross Attention
             new_mem_tokens = hidden[:, -num_mem:, :]
+            mem_tokens = mem_tokens.permute(1,0,2)
+            # print(mem_tokens.shape, new_mem_tokens.shape)
             mask_mem_mem = torch.ones((new_mem_tokens.shape[1], new_mem_tokens.shape[1]), dtype=torch.bool).to(new_mem_tokens.device)
-            mem_tokens_write, _ = self.mha_mem_to_mem(new_mem_tokens, mem_tokens, mem_tokens, attn_mask=mask_mem_mem)
-            # * END | Cross Attention
+            mem_tokens_write, _ = self.mha_mem_to_mem(mem_tokens, new_mem_tokens, new_mem_tokens, attn_mask=mask_mem_mem)
+            # print(mem_tokens_write.shape) # (bs, sl, emb_dim)
+            # ! END | Cross Attention
 
             # print('1', new_mem_tokens.shape, new_mem_tokens[0, :, 0])
             if self.mem_at_end:
